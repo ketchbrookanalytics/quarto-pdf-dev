@@ -8,10 +8,10 @@ We assume that you have Git, Docker, and VSCode installed.
 
 1. Clone this repository to your local machine.
 2. Ensure that Docker is running.
-3. Open the newly cloned foler containing this repository in VSCode.
-4. You should see a popup message in VSCode asking you if you want to "Reopen this folder in a container". Click "Reopen Folder in Container".
+3. Open the newly cloned folder containing this repository in VSCode.
+4. You should see a popup message in VSCode letting you know that this folder contains a Dev Container configuration file. Click "Reopen in Container".
 
-This will build the Docker image locally (which will take a few minutes the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would!
+This will build the Docker image locally (which will take a few minutes the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would! If you make changes to any of the files in the [.devcontainer/](.devcontainer/) directory, you will need to rebuild the image.
 
 ### Rendering the Report
 
