@@ -1,0 +1,48 @@
+% This is a combination of Pandoc templating and LaTeX
+% Pandoc templating https://pandoc.org/MANUAL.html#templates
+
+$if(titlepage-geometry)$
+\newgeometry{$for(titlepage-geometry)$$titlepage-geometry$$sep$,$endfor$}
+$endif$
+\begin{minipage}[b][\textheight][s]{\textwidth}
+\raggedright
+
+% Header image
+$if(title-bg-image)$
+\begin{center}
+    \includegraphics[width=16cm]{$title-bg-image$}
+\end{center}
+$endif$
+
+\vspace{7\baselineskip}
+
+% Title and subtitle
+\begin{center}
+  {\Huge\bfseries\nohyphens{$title$}}\\[2\baselineskip]
+\end{center}
+$if(subtitle)$
+\begin{center}
+  {\huge{$subtitle$}}
+\end{center}
+$endif$
+
+% Cover image
+$if(cover-image)$
+\begin{center}
+    \includegraphics[width=12cm]{$cover-image$}
+\end{center}
+$endif$
+
+% Flexible whitespace between the cover image and the footer
+\vfill
+
+% Footer
+{\LARGE{Authored By:}}\\[1\baselineskip]
+{\LARGE{$author-name$}}\\[1\baselineskip]
+\href{mailto:{$author-email$}}{\LARGE{{$author-email$}}}\\[1\baselineskip]
+{\LARGE{$author-phone$}}
+
+\end{minipage}
+$if(titlepage-geometry)$
+\restoregeometry
+$endif$

@@ -1,0 +1,52 @@
+---
+title: My Awesome Report
+subtitle: With a Really Cool Subtitle
+---
+
+## Using {tibble}
+
+Note that we have {tibble} & {knitr} already installed, thanks to our use of `r-apt` to install R in our `devcontainer.json` file:
+
+```{r}
+mtcars[, 1:4] |>
+    head() |>
+    tibble::as_tibble(rownames = "car") |>
+    knitr::kable()
+```
+
+## Using {ggplot2}
+
+To demonstrate that {ggplot2} is also installed thanks to our specification within `apt-packages` in our `devcontainer.json` file, here's a chart:
+
+```{r}
+#| fig-height: 8
+ggplot2::ggplot(
+    mtcars,
+    ggplot2::aes(
+        x = row.names(mtcars),
+        y = mpg
+    )
+) +
+    ggplot2::geom_bar(
+        stat = "identity",
+        fill = "lightblue",
+        color = "black"
+    ) +
+    ggplot2::labs(
+        title = "Miles per Gallon by Car",
+        x = "Car (Make & Model)",
+        y = "Miles per Gallon"
+    ) +
+    ggplot2::coord_flip() +
+    ggplot2::theme_minimal()
+```
+
+## Using mermaidjs
+
+Lastly, we have all of the dependencies we need to include mermaidjs diagrams, as well:
+
+```{mermaid}
+%%| echo: fenced
+flowchart LR
+    A[(Data)] --> B(["Logic (R Code)"]) --> C[[PDF Report]]
+```

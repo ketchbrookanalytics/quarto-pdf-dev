@@ -1,0 +1,52 @@
+// https://github.com/rocker-org/devcontainer-features
+{
+	"name": "My Awesome Report",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "."
+	},
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+
+		// Configure R on Ubuntu
+		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/r-apt.
+		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {
+			"vscodeRSupport": "full",
+			"installRMarkdown": true
+		},
+
+		// Install Quarto CLI
+		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/quarto-cli
+		"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
+			"installTinyTex": true,
+			"installChromium": true // need this for rendering mermaidjs diagrams to PDF/Word/etc.
+		},
+
+		// Install {ggplot2} & additional dependencies Chromium requires for mermaidjs
+		// More info: https://github.com/rocker-org/devcontainer-features/blob/main/src/quarto-cli/README.md#install-chromium
+		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+            "packages": "r-cran-ggplot2, libgtk-3-dev, libnotify-dev, libgconf-2-4, libnss3, libxss1, libasound2"
+        }
+
+	},
+
+	// Wait to install R packages until R is installed. More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/apt-packages#installation-order
+	"overrideFeatureInstallOrder": [
+		"ghcr.io/rocker-org/devcontainer-features/r-apt"
+	],
+
+	// Configure tool-specific properties.
+	"customizations": {
+		// Settings for VS Code.
+		"vscode": {
+			"extensions": [
+				"RDebugger.r-debugger",
+				"tomoki1207.pdf"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
