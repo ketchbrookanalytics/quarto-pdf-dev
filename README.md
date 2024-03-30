@@ -37,7 +37,7 @@ This repository contains the following components:
     + [before-body.tex](assets/before-body.tex) tells Quarto to put the cover page before everything else.
     + [in-header.tex](assets/in-header.tex) installs the pandoc libraries needed for the cover page design.
     + [www/](assets/www/) contains the proprietary images we use on the cover page of our reports.
-* [quarto.yml](quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/pdf.html) Quarto provides for rendering PDF documents, and also passes variables to [_titlepage.tex](assets/_titlepage.tex).
+* [_quarto.yml](_quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/pdf.html) Quarto provides for rendering PDF documents, and also passes variables to [_titlepage.tex](assets/_titlepage.tex).
 * [my-awesome-report.qmd](my-awesome-report.qmd) is an example Quarto report that showcases how to include LaTeX-style tables, plots, and mermaidjs diagrams.
 
 ## Future Work
