@@ -38,12 +38,12 @@ This repository contains the following components:
     + [in-header.tex](assets/in-header.tex) installs the pandoc libraries needed for the cover page design.
     + [www/](assets/www/) contains the proprietary images we use on the cover page of our reports.
 * [quarto.yml](quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/pdf.html) Quarto provides for rendering PDF documents, and also passes variables to [_titlepage.tex](assets/_titlepage.tex).
-* [my-awesome-report.qmd] is an example Quarto report that showcases how to include LaTeX-style tables, plots, and mermaidjs diagrams.
+* [my-awesome-report.qmd](my-awesome-report.qmd) is an example Quarto report that showcases how to include LaTeX-style tables, plots, and mermaidjs diagrams.
 
 ## Future Work
 
 There are a *million* different ways to configure your development environment. In future work on this template repository, we plan to showcase more of these options, such as:
 
-* configuring keyboard shortcuts in your [.devcontainer/devcontainer.json] file, such as a shortcut for the R base `|>` operator
+* configuring keyboard shortcuts in your [.devcontainer/devcontainer.json](.devcontainer/devcontainer.jsonfile), such as a shortcut for the R base `|>` operator
 * using {renv} for a more strict approach to R package version management
 * ... and more!
