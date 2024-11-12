@@ -46,6 +46,9 @@
 	"customizations": {
 		// Settings for VS Code.
 		"vscode": {
+			"settings": {
+				"editor.rulers": [80]
+			},
 			"extensions": [
 				"RDebugger.r-debugger",
 				"tomoki1207.pdf"
