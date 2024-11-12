@@ -29,7 +29,7 @@ Devcontainers in VSCode allow you to work inside of a Docker container. For us, 
 This repository contains the following components:
 
 * [.devcontainer/](.devcontainer/) contains two files:
-    + [devcontainer.json](.devcontainer/devcontainer.json) serves as the overall specification of the development environment. Any additional R packages needed can be installed by adding a `r-cran-<package>` to line 29.
+    + [devcontainer.json](.devcontainer/devcontainer.json) serves as the overall specification of the development environment. Any additional R packages needed can be installed by adding it to the list on line 34.
     + [Dockerfile](.devcontainer/Dockerfile) serves as the base Docker image that [devcontainer.json](.devcontainer/devcontainer.json) builds upon.
         + The Dockerfile specifies a Ubuntu image with Windows system fonts installed, so that we can use fonts that are more familiar with the target audience (e.g., Arial, Times New Roman, etc.) in our reports than the Ubuntu system fonts.
 * [assets/](assets/) contains the LaTeX scripts that help format the cover page of the report.

@@ -31,7 +31,7 @@
 
 		// Install additional R package dependencies
 		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "ggplot2",
+			"packages": "dplyr, ggplot2",
 			"additionalRepositories": "CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'"
 		}
 
