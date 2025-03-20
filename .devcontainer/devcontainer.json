@@ -51,7 +51,8 @@
 			},
 			"extensions": [
 				"RDebugger.r-debugger",
-				"tomoki1207.pdf"
+				"tomoki1207.pdf",
+				"quarto.quarto"
 			]
 		}
 	}
