@@ -1,9 +1,7 @@
 // https://github.com/rocker-org/devcontainer-features
 {
 	"name": "My Awesome Report",
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
+	"image": "selenium/standalone-chrome",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
@@ -11,7 +9,6 @@
 		// Install Quarto CLI
 		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/quarto-cli
 		"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
-			"installTinyTex": true,
 			"installChromium": true // need this for rendering mermaidjs diagrams to PDF/Word/etc.
 		},
 
