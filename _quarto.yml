@@ -8,7 +8,9 @@ execute:
   echo: true
 
 format:
-  typst: default
+  typst:
+    toc: true
+    number-sections: true
 
 mermaid:
   theme: default
