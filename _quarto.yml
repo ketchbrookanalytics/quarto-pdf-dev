@@ -8,26 +8,7 @@ execute:
   echo: true
 
 format:
-  pdf:
-    documentclass: scrbook
-    classoption: ["oneside", "open=any"]
-    toc: true
-    number-sections: true
-    mainfont: Arial
-    linkcolor: blue
-    template-partials:
-      - "assets/before-body.tex"
-      - "assets/_titlepage.tex"
-    include-in-header:
-      - "assets/in-header.tex"
-    # Variables passed to assets/_titlepage.tex
-    titlepage-geometry:
-      - top=1in
-      - bottom=1in
-      - right=1in
-      - left=1in
-    title-bg-image: assets/www/ka_logo.jpg
-    cover-image: assets/www/background.jpg
-    author-name: "Michael Thomas, M.S., Chief Data Scientist"
-    author-email: "mthomas@ketchbrookanalytics.com"
-    author-phone: "(555) 555 - 5555"
+  typst: default
+
+mermaid:
+  theme: default
