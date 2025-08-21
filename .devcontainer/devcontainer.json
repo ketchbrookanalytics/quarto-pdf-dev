@@ -1,7 +1,9 @@
 // https://github.com/rocker-org/devcontainer-features
 {
 	"name": "My Awesome Report",
-	"image": "browserless/chrome",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
@@ -14,16 +16,12 @@
 
 		// Configure R on Ubuntu
 		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/r-apt.
-		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {
-			// "vscodeRSupport": "full",
-			"installRMarkdown": true
-		}
+		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {},
 
-		// Uncomment to install additional R package dependencies
-		// "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-		// 	"packages": "dplyr, ggplot2",
-		// 	"additionalRepositories": "CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'"
-		// }
+		// Install additional R package dependencies
+		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+			"packages": "dplyr, ggplot2, github::nx10/httpgd, languageserver, rmarkdown"
+		}
 
 	},
 
@@ -31,9 +29,6 @@
 	"overrideFeatureInstallOrder": [
 		"ghcr.io/rocker-org/devcontainer-features/r-apt"
 	],
-
-	// Installing R package dependencies without pak
-	"postCreateCommand": ["Rscript", "-e", "install.packages(c('dplyr', 'ggplot2', 'rmarkdown'))"],
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -54,4 +49,3 @@
 	// Connect as root user. More info: https://aka.ms/dev-containers-non-root.
 	"remoteUser": "root"
 }
-
