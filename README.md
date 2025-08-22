@@ -13,6 +13,10 @@ We assume that you have Git, Docker, and VSCode installed.
 
 This will build the Docker image locally (which will take a few minutes the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would! If you make changes to any of the files in the [.devcontainer/](.devcontainer/) directory, you will need to rebuild the image.
 
+### Architecture Support
+
+This has been tested on both AMD64 and ARM64 architectures.
+
 ### Rendering the Report
 
 To render the [example report](my-awesome-report.qmd), run `quarto render my-awesome-report.qmd` from the terminal, and check the newly-created `_output/` directory once it finishes knitting.
