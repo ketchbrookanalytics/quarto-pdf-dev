@@ -1,7 +1,9 @@
 // https://github.com/rocker-org/devcontainer-features
 {
 	"name": "My Awesome Report",
-	"image": "selenium/standalone-chrome",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
@@ -14,15 +16,13 @@
 
 		// Configure R on Ubuntu
 		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/r-apt.
-		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {
-			"vscodeRSupport": "full",
-			"installRMarkdown": true
-		},
+		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {},
 
 		// Install additional R package dependencies
+		// Note: httpgd has been archived on CRAN as of 2025-04-23, see
+		// https://cran.r-project.org/web/packages/httpgd/index.html
 		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "dplyr, ggplot2",
-			"additionalRepositories": "CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'"
+			"packages": "dplyr, ggplot2, github::nx10/httpgd, languageserver, rmarkdown"
 		}
 
 	},
@@ -39,11 +39,12 @@
 			"settings": {
 				"editor.rulers": [80]
 			},
+			// We also recommend installing the `tomoki1207.pdf` extension,
+			// but it needs to be installed locally (not in Dev Container)
 			"extensions": [
 				"quarto.quarto",
 				"RDebugger.r-debugger",
-				"REditorSupport.r",
-				"tomoki1207.pdf"
+				"REditorSupport.r"
 			]
 		}
 	},
