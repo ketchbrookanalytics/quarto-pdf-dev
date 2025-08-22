@@ -19,6 +19,8 @@
 		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {},
 
 		// Install additional R package dependencies
+		// Note: httpgd has been archived on CRAN as of 2025-04-23, see
+		// https://cran.r-project.org/web/packages/httpgd/index.html
 		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
 			"packages": "dplyr, ggplot2, github::nx10/httpgd, languageserver, rmarkdown"
 		}
