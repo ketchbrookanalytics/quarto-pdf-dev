@@ -9,8 +9,18 @@ execute:
 
 format:
   typst:
+    author: "Michael Thomas"
+    template-partials:
+      - assets/typst-show.typ
+      - assets/typst-template.typ
     toc: true
+    lof: true
+    lot: false
     number-sections: true
+    background-img:
+      path: assets/www/background.jpg
+    header-logo:
+      path: assets/www/logo.jpg
 
 mermaid:
   theme: default
