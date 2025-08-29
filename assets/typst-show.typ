@@ -5,6 +5,12 @@ $endif$
 $if(author)$
   author: "$author$",
 $endif$
+$if(author-email)$
+  author-email: [$author-email$],
+$endif$
+$if(author-phone)$
+  author-phone: "$author-phone$",
+$endif$
 $if(toc)$
   toc: $toc$,
 $endif$
@@ -19,5 +25,8 @@ $if(background-img)$
 $endif$
 $if(header-logo)$
   header-logo: "$header-logo.path$",
+$endif$
+$if(main-color)$
+  main-color: "$main-color$",
 $endif$
 )

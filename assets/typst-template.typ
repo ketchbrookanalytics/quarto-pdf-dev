@@ -3,13 +3,15 @@
   title: "",
   subtitle: none,
   author: "",
+  author-email: "",
+  author-phone: "",
   toc: false,
   lof: false,
   lot: false,
   date: datetime.today().display(),
   background-img: none,
   header-logo: none,
-  main-color: "2f70c8",
+  main-color: none,
   doc,
 ) = {
   set document(author: author, title: title)
@@ -20,6 +22,22 @@
 
   // Set colors
   let primary-color = rgb(main-color) // alpha = 100%
+
+  // Function to parse content and return string
+  // Workaround for aggressive escape characters
+  // See issue for details https://github.com/quarto-dev/quarto-cli/discussions/10223
+  // Used to create mailto link to author-email
+  let to-string(content) = {
+    if content.has("text") {
+      content.text
+    } else if content.has("children") {
+      content.children.map(to-string).join("")
+    } else if content.has("body") {
+      to-string(content.body)
+    } else if content == [ ] {
+      " "
+    }
+  }
 
   // Set body font family.
   set text(font: body-font, 12pt)
@@ -71,7 +89,8 @@
   // Author and other information.
   align(center)[
       #if author != "" {strong(author); linebreak();}
-
+      #if author-email != "" {link("mailto:" + to-string(author-email)); linebreak();}
+      #if author-phone != "" {author-phone; linebreak();}
     ]
 
   pagebreak()

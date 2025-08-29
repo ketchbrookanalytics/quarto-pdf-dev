@@ -10,6 +10,9 @@ execute:
 format:
   typst:
     author: "Michael Thomas"
+    author-email: mthomas@ketchbrookanalytics.com
+    author-phone: "(555) 555 - 5555"
+    main-color: "2f70c8"
     template-partials:
       - assets/typst-show.typ
       - assets/typst-template.typ
