@@ -123,7 +123,10 @@
 
   // Main body.
   set page(
-    header: [#emph()[#title #h(1fr) #author]]
+    header: [
+      #set text(8pt)
+      #emph()[#title #h(1fr) #author]
+    ]
   )
   set par(justify: true)
 
