@@ -73,7 +73,7 @@
   align(center + horizon, text(font: title-font, 3em, weight: 700, title))
   v(2em, weak: true)
   if subtitle != none {
-  align(center + horizon, text(font: title-font, 2em, weight: 700, subtitle))
+  align(center + horizon, text(font: title-font, 1.5em, weight: 700, subtitle))
   v(2em, weak: true)
   }
   align(center, text(1.1em, date))
