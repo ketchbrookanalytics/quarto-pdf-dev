@@ -53,6 +53,9 @@
   // Set heading numbering
   set heading(numbering: "1.1")
 
+  // Set blocks to not allow breaking
+  set block(breakable: false)
+
   // Set link style
   show link: it => underline(text(fill: primary-color, it))
 
