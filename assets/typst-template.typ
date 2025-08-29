@@ -10,7 +10,6 @@
   background-img: none,
   header-logo: none,
   main-color: "2f70c8",
-  alpha: 60%,
   doc,
 ) = {
   set document(author: author, title: title)
@@ -21,8 +20,6 @@
 
   // Set colors
   let primary-color = rgb(main-color) // alpha = 100%
-  // change alpha of primary color
-  let secondary-color = color.mix(color.rgb(100%, 100%, 100%, alpha), primary-color, space:rgb)
 
   // Set body font family.
   set text(font: body-font, 12pt)
@@ -42,6 +39,9 @@
 
   // display of outline entries
   show outline.entry: it => text(size: 12pt, weight: "regular",it)
+
+  // set code block style
+  show raw.where(block: true): set block(fill: rgb("#dedede"))
 
 
     // KA Header.
@@ -100,8 +100,7 @@
   set page(
     numbering: "1",
     number-align: center,
-    )
-
+  )
 
   // Main body.
   set page(

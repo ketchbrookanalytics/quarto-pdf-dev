@@ -16,7 +16,6 @@ format:
     toc: true
     lof: true
     lot: true
-    number-sections: true
     background-img:
       path: assets/www/background.jpg
     header-logo:
