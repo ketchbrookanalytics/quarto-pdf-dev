@@ -15,7 +15,7 @@ format:
       - assets/typst-template.typ
     toc: true
     lof: true
-    lot: false
+    lot: true
     number-sections: true
     background-img:
       path: assets/www/background.jpg

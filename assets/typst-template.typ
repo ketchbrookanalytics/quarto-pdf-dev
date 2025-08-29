@@ -3,7 +3,7 @@
   title: "",
   subtitle: none,
   author: "",
-  toc: true,
+  toc: false,
   lof: false,
   lot: false,
   date: datetime.today().display(),
@@ -83,14 +83,14 @@
   if lof {
     outline(
     title: [List of Figures],
-    target: figure.where(kind: image),
+    target: figure.where(kind: "quarto-float-fig"),
     )
   }
 
   if lot {
     outline(
     title: [List of Tables],
-    target: figure.where(kind: table),
+    target: figure.where(kind: "quarto-float-tbl"),
     )
   }
 
