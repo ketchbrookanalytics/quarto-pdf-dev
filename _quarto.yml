@@ -23,6 +23,7 @@ format:
       path: assets/www/background.jpg
     header-logo:
       path: assets/www/logo.jpg
+    bibliography: references.bib
 
 mermaid:
   theme: default
