@@ -13,6 +13,10 @@ We assume that you have Git, Docker, and VSCode installed.
 
 This will build the Docker image locally (which will take a few minutes the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would! If you make changes to any of the files in the [.devcontainer/](.devcontainer/) directory, you will need to rebuild the image.
 
+### Architecture Support
+
+This has been tested on both AMD64 and ARM64 architectures.
+
 ### Rendering the Report
 
 To render the [example report](my-awesome-report.qmd), run `quarto render my-awesome-report.qmd` from the terminal, and check the newly-created `_output/` directory once it finishes knitting.
@@ -29,16 +33,15 @@ Devcontainers in VSCode allow you to work inside of a Docker container. For us, 
 This repository contains the following components:
 
 * [.devcontainer/](.devcontainer/) contains two files:
-    + [devcontainer.json](.devcontainer/devcontainer.json) serves as the overall specification of the development environment. Any additional R packages needed can be installed by adding it to the list on line 34.
+    + [devcontainer.json](.devcontainer/devcontainer.json) serves as the overall specification of the development environment. Any additional R packages needed can be installed by adding it to the list on line 25.
     + [Dockerfile](.devcontainer/Dockerfile) serves as the base Docker image that [devcontainer.json](.devcontainer/devcontainer.json) builds upon.
-        + The Dockerfile specifies a Ubuntu image with Windows system fonts installed, so that we can use fonts that are more familiar with the target audience (e.g., Arial, Times New Roman, etc.) in our reports than the Ubuntu system fonts.
-* [assets/](assets/) contains the LaTeX scripts that help format the cover page of the report.
-    + [_titlepage.tex](assets/_titlepage.tex) specifies the design of the cover page.
-    + [before-body.tex](assets/before-body.tex) tells Quarto to put the cover page before everything else.
-    + [in-header.tex](assets/in-header.tex) installs the pandoc libraries needed for the cover page design.
+        + The Dockerfile installs several system dependency for [pak](https://pak.r-lib.org/), an R package installer.
+* [assets/](assets/) contains the [Typst](https://quarto.org/docs/output-formats/typst.html) files that help create the report.
+    + [typst-template.typ](assets/typst-template.typ) outlines the [Typst template](https://typst.app/docs/tutorial/making-a-template/) that is used to create the report.
+    + [typst-show.typ](assets/typst-show.typ) details the mapping of Pandoc metatdata to function arguments in [typst-template.typ](assets/typst-template.typ).
     + [www/](assets/www/) contains the proprietary images we use on the cover page of our reports.
-* [_quarto.yml](_quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/pdf.html) Quarto provides for rendering PDF documents, and also passes variables to [_titlepage.tex](assets/_titlepage.tex).
-* [my-awesome-report.qmd](my-awesome-report.qmd) is an example Quarto report that showcases how to include LaTeX-style tables, plots, and mermaidjs diagrams.
+* [_quarto.yml](_quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/typst.html) Quarto provides for rendering PDF documents, and also passes variables to [typst-show.typ](assets/typst-show.typ) which, in turn, passes values to [typst-template.typ](assets/typst-template.typ).
+* [my-awesome-report.qmd](my-awesome-report.qmd) is an example Quarto report that showcases how to include Typst-style tables, plots, and mermaidjs diagrams.
 
 ## Future Work
 

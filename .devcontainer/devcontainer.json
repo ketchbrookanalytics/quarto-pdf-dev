@@ -2,37 +2,27 @@
 {
 	"name": "My Awesome Report",
 	"build": {
-		"dockerfile": "Dockerfile",
-		"context": "."
+		"dockerfile": "Dockerfile"
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 
-		// Configure R on Ubuntu
-		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/r-apt.
-		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {
-			"vscodeRSupport": "full",
-			"installRMarkdown": true
-		},
-
 		// Install Quarto CLI
 		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/quarto-cli
 		"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
-			"installTinyTex": true,
 			"installChromium": true // need this for rendering mermaidjs diagrams to PDF/Word/etc.
 		},
 
-		// Install additional system dependencies Chromium requires for mermaidjs
-		// More info: https://github.com/rocker-org/devcontainer-features/blob/main/src/quarto-cli/README.md#install-chromium
-		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-            "packages": "libgtk-3-dev, libnotify-dev, libgconf-2-4, libnss3, libxss1, libasound2"
-        },
+		// Configure R on Ubuntu
+		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/r-apt.
+		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {},
 
 		// Install additional R package dependencies
+		// Note: httpgd has been archived on CRAN as of 2025-04-23, see
+		// https://cran.r-project.org/web/packages/httpgd/index.html
 		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "dplyr, ggplot2",
-			"additionalRepositories": "CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest'"
+			"packages": "dplyr, ggplot2, github::nx10/httpgd, languageserver, rmarkdown"
 		}
 
 	},
@@ -49,14 +39,16 @@
 			"settings": {
 				"editor.rulers": [80]
 			},
+			// We also recommend installing the `tomoki1207.pdf` extension,
+			// but it needs to be installed locally (not in Dev Container)
 			"extensions": [
+				"quarto.quarto",
 				"RDebugger.r-debugger",
-				"tomoki1207.pdf",
-				"quarto.quarto"
+				"REditorSupport.r"
 			]
 		}
-	}
+	},
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	// Connect as root user. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "root"
 }
