@@ -5,7 +5,7 @@ subtitle: With a Really Cool Subtitle
 
 ## Using {tibble}
 
-Note that we have {tibble} & {knitr} already installed, thanks to our use of `r-apt` to install R in our `devcontainer.json` file. See @tbl-mt-cars for more information.
+Note that we have {tibble} & {knitr} already installed, thanks to our use of the `r-packages` feature to install {dplyr} and {rmarkdown} (which depend on {tibble} and {knitr}, respectively) in our `devcontainer.json` file. See @tbl-mt-cars for more information.
 
 ```{r}
 #| label: tbl-mt-cars
@@ -18,7 +18,7 @@ mtcars[, 1:4] |>
 
 ## Using {ggplot2}
 
-To demonstrate that {ggplot2} is also installed thanks to our specification within `apt-packages` in our `devcontainer.json` file, @fig-plot-mtcars displays a chart of these values.
+Similarly, {ggplot2} is also installed. @fig-plot-mtcars displays a chart of these values.
 
 ```{r}
 #| label: fig-plot-mtcars
@@ -47,7 +47,7 @@ ggplot2::ggplot(
 
 ## Using mermaidjs
 
-Lastly, we have all of the dependencies we need to include mermaidjs diagrams, as well:
+Lastly, we have all of the dependencies we need to include mermaidjs diagrams, thanks to the combination of using the `browserless/chrome` base Docker image and the `installChromium` option in the `quarto-cli` feature.
 
 ```{mermaid}
 %%| echo: fenced
