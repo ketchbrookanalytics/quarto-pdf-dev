@@ -1,4 +1,4 @@
-FROM browserless/chrome
+FROM ghcr.io/browserless/chromium:latest
 
 # install system dependency for pak
 USER root
