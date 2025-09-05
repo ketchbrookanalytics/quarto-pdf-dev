@@ -43,10 +43,25 @@ This repository contains the following components:
 * [_quarto.yml](_quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/typst.html) Quarto provides for rendering PDF documents, and also passes variables to [typst-show.typ](assets/typst-show.typ) which, in turn, passes values to [typst-template.typ](assets/typst-template.typ).
 * [my-awesome-report.qmd](my-awesome-report.qmd) is an example Quarto report that showcases how to include Typst-style tables, plots, and mermaidjs diagrams.
 
+## Using {renv}
+
+If you want to leverage [{renv}](https://rstudio.github.io/renv/index.html) for greater reproducibility and caching of R packages for faster Docker re-build speeds, we have developed an opinionated approach using the [renv-cache feature](https://github.com/rocker-org/devcontainer-features/tree/main/src/renv-cache), {renv}, and [{pak}](https://pak.r-lib.org/).
+
+### Setting Up the {renv} approach
+
+1. Create an `.Renviron` file at the root of this repository containing the line `RENV_CONFIG_PAK_ENABLED=true`
+    + This enables {renv} to use {pak} on the backend for package installation. The benefit of {pak} is that it (a) ensures R package binaries are installed when available and (b) identifies and installs system package dependencies of the R packages you are installing.
+1. Re-build and re-open the Dev Container.
+1. In an R console, run `renv::init(bare = TRUE)` to set up the {renv} project without discovering and automatically installing R package dependencies of your project.
+    + `renv::init()` will not install packages via {pak}, though `renv::install()` will.
+    + You will be prompted to start a new R session. The easiest way to do this is to kill the existing R terminal and create a new R terminal.
+1. To install the initial R packages that this template repository depends on, run `renv::install(c("dplyr", "ggplot2", "github::nx10/httpgd", "languageserver", "rmarkdown"))` from the new R terminal.
+1. To snapshot these packages & associated versions in an `renv.lock` lock file, run `renv::snapshot()`.
+1. As you develop and you need to leverage more R packages in your project, run `renv::install("<package_name>")` to install them and then `renv::snapshot()` to memorialize them in the `renv.lock` lock file.
+
 ## Future Work
 
 There are a *million* different ways to configure your development environment. In future work on this template repository, we plan to showcase more of these options, such as:
 
 * configuring keyboard shortcuts in your [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json) file, such as a shortcut for the R base `|>` operator
-* using {renv} for a more strict approach to R package version management
 * ... and more!
