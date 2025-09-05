@@ -1,6 +1,6 @@
-FROM ghcr.io/browserless/chromium:latest
+FROM ghcr.io/browserless/chrome:latest
 
-# install system dependency for pak
+# install system dependencies for pak
 USER root
 RUN apt-get update && apt-get install -y \
   # {Matrix}
