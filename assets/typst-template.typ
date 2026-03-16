@@ -68,6 +68,9 @@
   // Set table of contents, list of figures, and list of tables display
   show outline.entry: it => text(size: 12pt, weight: "regular",it)
 
+  // Set cross-reference color
+  show ref: it => text(fill: primary-color, it)
+
   // Set code block background fill
   show raw.where(block: true): set block(fill: rgb("#dedede"))
 
