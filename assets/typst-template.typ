@@ -8,7 +8,7 @@
   toc: false,
   lof: false,
   lot: false,
-  date: datetime.today().display(),
+  date: datetime.today().display("[month repr:long] [day], [year]"),
   background-img: none,
   header-logo: none,
   main-color: none,
