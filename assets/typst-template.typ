@@ -2,6 +2,7 @@
 #let template(
   title: "",
   subtitle: none,
+  company: "",
   author: "",
   author-email: "",
   author-phone: "",
@@ -158,7 +159,7 @@
   set page(
     header: [
       #set text(8pt)
-      #emph()[#title #h(1fr) #author]
+      #emph()[#title #h(1fr) #company]
     ]
   )
 

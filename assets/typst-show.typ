@@ -5,6 +5,9 @@ $endif$
 $if(subtitle)$
   subtitle: "$subtitle$",
 $endif$
+$if(company)$
+  company: "$company$",
+$endif$
 $if(author)$
   author: "$author$",
 $endif$

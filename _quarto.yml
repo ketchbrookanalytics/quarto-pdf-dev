@@ -9,6 +9,7 @@ execute:
 
 format:
   typst:
+    company: "Ketchbrook Analytics"
     author: "Michael Thomas"
     author-email: mthomas@ketchbrookanalytics.com
     author-phone: "(555) 555 - 5555"
