@@ -72,4 +72,4 @@ COPY report.qmd     report.qmd
 RUN R -q -e "renv::restore()"
 
 # Render the report
-CMD ["quarto render report.qmd"]
+CMD ["quarto", "render"]
