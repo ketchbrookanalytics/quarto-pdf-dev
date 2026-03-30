@@ -6,7 +6,8 @@ project:
 
 editor: source
 execute:
-  echo: true
+  echo: false
+engine: knitr
 
 format:
   typst:
