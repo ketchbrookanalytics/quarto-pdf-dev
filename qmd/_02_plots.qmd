@@ -1,0 +1,9 @@
+We use {ggplot2} for charts. See @fig-plot-mtcars for an example chart.
+
+```{r}
+#| label: fig-plot-mtcars
+#| fig-height: 5
+#| fig-cap: A chart of the first few rows of mtcars
+
+targets::tar_read(mtcars_plt)
+```
