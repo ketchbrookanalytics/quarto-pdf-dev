@@ -31,9 +31,6 @@ RUN wget -q "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUART
 # Install the latest version of {pak}
 RUN R -q -e "install.packages('pak')"
 
-# Build upon the dev image (called by the devcontainer) & add prod instructions
-FROM dev AS prod
-
 # Ensure we use {pak} on the backend with {renv} to install the packages in the
 # lock file
 ENV RENV_CONFIG_PAK_ENABLED=true
@@ -49,7 +46,13 @@ ENV RENV_CONFIG_SYNCHRONIZED_CHECK=false
 ARG RENV_VERSION=1.1.7
 
 # Install {renv}
+# Note that we won't use {renv} to install packages during development;
+# conversely, we'll use {pak}. We'll only use {renv} during the pre-deployment
+# process (see README for further instructions).
 RUN R -q -e "pak::pkg_install('rstudio/renv@v${RENV_VERSION}')"
+
+# Build upon the dev image (called by the devcontainer) & add prod instructions
+FROM dev AS prod
 
 # Set the working directory for the project
 WORKDIR /project

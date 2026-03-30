@@ -55,17 +55,32 @@ The devcontainer also offers the following additional features:
 
 Before you formally handoff your work to someone else, you'll want to use {renv} to lock down the versions of the R packages you used (as evidenced in the `prod` stage of the multi-stage build in the [Dockerfile](Dockerfile)) so that the work is *fully reproducible*. In order to do so, run the following commands in an R terminal:
 
-```r 
+```r
 # Initialize {renv}
-renv::init(bare = TRUE)
+renv::init(bare = TRUE)   # Answer "y" / "Yes", then restart R
 
-# Create a renv.lock file with the currently installed dependencies
+# Allow {renv} to use the already installed version of {pak}
+renv::hydrate(packages = "pak")   # Answer "Y" / "Yes"
+
+# Enable `renv::dependencies()` (it requires {yaml} be installed) 
+renv::install("yaml")
+
+# Discover project R package dependencies
+deps <- unique(renv::dependencies()$Package)
+
+# Install R package dependencies for the project
+renv::install(deps[deps != "renv"])   # Select "Y" or "Yes"
+
+# Create the renv.lock lockfile
+# Note: if prompted to first install additional required packages, follow the
+# directions to do so via `renv::install()` prior to re-running renv::snapshot()
 renv::snapshot()
+
 ```
 
 The resulting `renv.lock` file will be used by Docker during build time to install the exact R package dependencies used in the project via `renv::restore()`.
 
-You're now ready to hand off this repository to others who want to reproduce your work.
+Commit and push the changes to the repository. You're now ready to hand off this repository to others who want to reproduce your work.
 
 ## Reproduction
 
