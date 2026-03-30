@@ -109,7 +109,7 @@ The above command builds the *prod* Docker image from the specified `Dockerfile`
 docker run --rm -v "$(pwd)/data:/project/data:ro" -v "$(pwd)/_output:/project/_output" ketchbrook/report
 ```
 
-The above command runs a Docker container based upon the built `ketchbrook/risk-demo` image (containing all of our dependencies) and executes the command at the end of the Dockerfile, which **generates the model validation report in a new directory called `_output/`**.
+The above command runs a Docker container based upon the built `ketchbrook/report` image (containing all of our dependencies) and executes the command at the end of the Dockerfile, which **generates the model validation report in a new directory called `_output/`**.
 
 The middle lines of the above command represent communication between our local filesystem and the container (which by default has no access to your local filesystem).
 
