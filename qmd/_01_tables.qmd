@@ -1,0 +1,8 @@
+We use {gt} for tables. See @tbl-mt-cars for an example table.
+
+```{r}
+#| label: tbl-mt-cars
+#| tbl-cap: First few rows of mtcars
+
+targets::tar_read(mtcars_tbl)
+```

@@ -1,0 +1,34 @@
+---
+title: My Awesome Report
+subtitle: With a Really Cool Subtitle
+---
+
+```{r}
+# Ensure that {gt} tables get rendered correctly
+library(gt)
+```
+
+## Using {gt} for Tables
+
+{{< include /qmd/_01_tables.qmd >}}
+
+{{< pagebreak >}}
+
+## Using {ggplot2} for Charts
+
+{{< include /qmd/_02_plots.qmd >}}
+
+{{< pagebreak >}}
+
+## Using mermaidjs for Diagrams
+
+{{< include /qmd/_03_diagrams.qmd >}}
+
+{{< pagebreak >}}
+
+## Miscellaneous
+
+This approach also makes use of {targets}, which is courtesy of @landau2021.
+
+::: {#refs}
+:::

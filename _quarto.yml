@@ -2,10 +2,12 @@ project:
   title: "My Awesome Report using VSCode Devcontainers"
   execute-dir: project
   output-dir: _output
+  pre-render: R -q -e "targets::tar_make()"
 
 editor: source
 execute:
-  echo: true
+  echo: false
+engine: knitr
 
 format:
   typst:

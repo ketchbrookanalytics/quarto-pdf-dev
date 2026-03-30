@@ -2,47 +2,48 @@
 {
 	"name": "My Awesome Report",
 	"build": {
-		"dockerfile": "Dockerfile"
+		"dockerfile": "../Dockerfile",
+		"target": "dev"
 	},
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {
-
-		// Install Quarto CLI
-		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/quarto-cli
-		"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
-			"installChromium": true // need this for rendering mermaidjs diagrams to PDF/Word/etc.
-		},
-
-		// Configure R on Ubuntu
-		// More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/r-apt.
-		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {},
-
-		// Install additional R package dependencies
-		// Note: httpgd has been archived on CRAN as of 2025-04-23, see
-		// https://cran.r-project.org/web/packages/httpgd/index.html
-		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "dplyr, ggplot2, github::nx10/httpgd, languageserver, rmarkdown",
-			"installSystemRequirements": true
-		}
-
+	// Install the `arf` R terminal and R packages for developing in VScode
+	"postCreateCommand": {
+	    "arf": "apt-get update -qq && apt-get install -y -qq curl xz-utils && curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh",
+	    "r-packages": "R -q -e \"pak::pkg_install(c('ggplot2', 'gt', 'httpgd', 'languageserver', 'targets', 'tibble'))\""
 	},
-
-	// Wait to install R packages until R is installed. More info: https://github.com/rocker-org/devcontainer-features/tree/main/src/apt-packages#installation-order
-	"overrideFeatureInstallOrder": [
-		"ghcr.io/rocker-org/devcontainer-features/r-apt"
-	],
 
 	// Configure tool-specific properties.
 	"customizations": {
 		// Settings for VS Code.
 		"vscode": {
 			"settings": {
-				"editor.rulers": [80]
+				"files.useExperimentalFileWatcher": true,
+				"editor.rulers": [80],
+				"terminal.integrated.profiles.linux": {
+        		  "arf": {
+        		    "path": "/root/.cargo/bin/arf",
+        		    "icon": "terminal"
+        		  }
+        		},
+        		"terminal.integrated.defaultProfile.linux": "arf",
+	    		"r.rterm.linux": "/root/.cargo/bin/arf",
+	    		"r.bracketedPaste": true,
+	    		"r.sessionWatcher": true,
+	    		"r.plot.useHttpgd": true,
+	    		"[r]": {
+    			    "editor.formatOnSave": true,
+    			    "editor.defaultFormatter": "Posit.air-vscode"
+    			},
+    			"[quarto]": {
+    			    "editor.formatOnSave": true,
+    			    "editor.defaultFormatter": "quarto.quarto"
+    			}
 			},
 			// We also recommend installing the `tomoki1207.pdf` extension,
 			// but it needs to be installed locally (not in Dev Container)
 			"extensions": [
+				"Anthropic.claude-code",
+				"Posit.air-vscode",
 				"quarto.quarto",
 				"RDebugger.r-debugger",
 				"REditorSupport.r"

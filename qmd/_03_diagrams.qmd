@@ -1,0 +1,27 @@
+::: {.callout-tip}
+## Never heard of Mermaid?
+
+Mermaid is an open source diagrams-as-code project. Learn more at <https://mermaid.ai/open-source/>.
+:::
+
+We also have all of the dependencies we need to include mermaidjs diagrams, thanks to the combination of using Quarto & Chrome in our base Docker image.
+
+@fig-diagram-workflow-horizontal shows one mermaid diagram.
+
+```{mermaid}
+%%| label: fig-diagram-workflow-horizontal
+%%| fig-cap: A horizontal mermaid diagram
+
+flowchart LR
+    A[(Data)] --> B(["Logic (R Code)"]) --> C[[PDF Report]]
+```
+
+And @fig-diagram-workflow-vertical shows the same diagram, vertically.
+
+```{mermaid}
+%%| label: fig-diagram-workflow-vertical
+%%| fig-cap: A vertical mermaid diagram
+
+flowchart TB
+    A[(Data)] --> B(["Logic (R Code)"]) --> C[[PDF Report]]
+```
