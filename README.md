@@ -3,7 +3,7 @@
 This repository provides a template framework for authoring PDF reports with [Quarto](https://quarto.org/) inside of a [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers), as well as deploying them as reproducible software artifacts via [Docker]().
 
 > [!NOTE]
-> This has been tested on both AMD64 and ARM64 architectures.
+> This has been tested on both AMD64 and ARM64 architectures. Both the **Development** and **Deployment** steps are working on AMD64. On our ARM64 tests, the **Development** steps are working, but the **Deployment** steps are throwing an error. See [Issue 15](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/15) for more information.
 
 ## Development
 
@@ -17,6 +17,10 @@ We assume that you have Git, Docker, and VSCode installed.
 2. Ensure that Docker is running.
 3. Open the newly cloned folder containing this repository in VSCode.
 4. You should see a popup message in VSCode letting you know that this folder contains a Dev Container configuration file. Click "Reopen in Container".
+
+If you don't see the popup, you can also reopen in container via the VSCode Command Palette:
+- Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the Command Palette.
+- Search for "Dev Containers: Reopen in Container" and select it.
 
 This will build the Docker image locally (which will take a few minutes the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would! If you make changes to any of the files in the [.devcontainer/](.devcontainer/) directory, you will need to rebuild the image.
 
@@ -94,6 +98,9 @@ An end user who wants to reproduce the report will have to perform the following
 Steps 3 and 4 are further explained below.
 
 ### Build the Docker Image
+
+> [!IMPORTANT]
+> This step must be run **outside the devcontainer** (e.g., in your native terminal, not inside VS Code).
 
 In order to build the Docker image that contains all of the project's dependencies, run the following command from a bash/shell terminal:
 
