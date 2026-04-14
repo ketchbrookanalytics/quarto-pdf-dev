@@ -17,19 +17,19 @@
 		// Settings for VS Code.
 		"vscode": {
 			"settings": {
-				"files.useExperimentalFileWatcher": true,
 				"editor.rulers": [80],
+				"files.useExperimentalFileWatcher": true,
+	    		"r.bracketedPaste": true,
+	    		"r.plot.useHttpgd": true,
+	    		"r.rterm.linux": "/root/.cargo/bin/arf",
+	    		"r.sessionWatcher": true,
+        		"terminal.integrated.defaultProfile.linux": "arf",
 				"terminal.integrated.profiles.linux": {
         		  "arf": {
         		    "path": "/root/.cargo/bin/arf",
         		    "icon": "terminal"
         		  }
         		},
-        		"terminal.integrated.defaultProfile.linux": "arf",
-	    		"r.rterm.linux": "/root/.cargo/bin/arf",
-	    		"r.bracketedPaste": true,
-	    		"r.sessionWatcher": true,
-	    		"r.plot.useHttpgd": true,
 	    		"[r]": {
     			    "editor.formatOnSave": true,
     			    "editor.defaultFormatter": "Posit.air-vscode"
