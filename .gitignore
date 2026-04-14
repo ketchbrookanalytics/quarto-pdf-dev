@@ -1,2 +1,4 @@
 /.quarto/
 /_output/
+/data/
+**/*.quarto_ipynb

@@ -1,0 +1,5 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+mtcars_plt|stem|ba7ae5813217812f|a79761482cc81f7b|052dcd07fc4383e9|1373372387||t20542.8095092516s|s232553b|232553|rds|local|vector|||0.096||
+mtcars_tbl|stem|bf9dbbed505e6d83|2d5663e64daf5db0|68b2388d0395d37e|1768412078||t20542.8095100192s|s3029b|3029|rds|local|vector|||0.023||
+create_mtcars_tbl|function|61d140bfc41e4b8e
+create_mtcars_plt|function|72adf4604ee17ca8
