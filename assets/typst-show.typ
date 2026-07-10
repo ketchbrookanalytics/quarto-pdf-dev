@@ -36,3 +36,5 @@ $if(main-color)$
   main-color: "$main-color$",
 $endif$
 )
+
+#show figure: set block(breakable: true)
