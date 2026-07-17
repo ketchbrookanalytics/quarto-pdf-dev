@@ -27,6 +27,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 RUN wget -q "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb" \
   && dpkg -i "quarto-${QUARTO_VERSION}-linux-amd64.deb" \
   && rm "quarto-${QUARTO_VERSION}-linux-amd64.deb"
+ARG TARGETARCH
+RUN wget -q "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb" \
+  && dpkg -i "quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb" \
+  && rm "quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb" \
 
 # Install the latest version of {pak}
 RUN R -q -e "install.packages('pak')"
