@@ -15,7 +15,7 @@ $if(author-email)$
   author-email: [$author-email$],
 $endif$
 $if(author-phone)$
-  author-phone: "$author-phone$",
+  author-phone: [$author-phone$],
 $endif$
 $if(toc)$
   toc: $toc$,
