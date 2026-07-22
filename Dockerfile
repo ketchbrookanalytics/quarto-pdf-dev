@@ -55,7 +55,7 @@ ENV RENV_CONFIG_SANDBOX_ENABLED=false
 ENV RENV_CONFIG_SYNCHRONIZED_CHECK=false
 
 # Define the version of {renv} to install
-ARG RENV_VERSION=1.1.7
+ARG RENV_VERSION=1.2.3
 
 # Install {renv}
 # Note that we won't use {renv} to install packages during development;
