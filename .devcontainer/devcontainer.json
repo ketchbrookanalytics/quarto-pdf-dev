@@ -6,11 +6,21 @@
 		"target": "dev"
 	},
 
-	// Install the `arf` R terminal and R packages for developing in VScode
-	"postCreateCommand": {
-	    "arf": "apt-get update -qq && apt-get install -y -qq curl xz-utils && curl --proto '=https' --tlsv1.2 -LsSf https://github.com/eitsupi/arf/releases/latest/download/arf-console-installer.sh | sh",
-	    "r-packages": "R -q -e \"pak::pkg_install(c('ggplot2', 'gt', 'httpgd', 'languageserver', 'targets', 'tibble'))\""
-	},
+	// Install the `arf` R terminal and R packages for developing in VScode.
+	// Run as a single sequential script (rather than the object form, whose
+	// entries run in parallel) so arf's apt-get calls can't race pak's own
+	// apt-get sysreqs installation and deadlock on the dpkg lock.
+	"postCreateCommand": [
+		"bash",
+		".devcontainer/postCreate.sh",
+		// Specify list of R packages
+		"ggplot2",
+		"gt",
+		"httpgd",
+		"languageserver",
+		"targets",
+		"tibble"
+	],
 
 	// Configure tool-specific properties.
 	"customizations": {
