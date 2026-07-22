@@ -11,6 +11,7 @@ ARG QUARTO_VERSION=1.9.38
 # (installed below) needs at runtime to render mermaid/graphviz diagrams.
 RUN apt-get update && apt-get install --no-install-recommends -y \
     fonts-roboto \
+    fonts-noto-color-emoji \
     wget \
     libnss3 \
     libnspr4 \
