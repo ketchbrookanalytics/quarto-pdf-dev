@@ -1,5 +1,5 @@
 # Define the version of R that we'll be using
-ARG R_VERSION=4.5.2
+ARG R_VERSION=4.6.0
 
 # Use the rocker/verse base image to install the specific version of R
 FROM rocker/r-ver:${R_VERSION} AS dev
