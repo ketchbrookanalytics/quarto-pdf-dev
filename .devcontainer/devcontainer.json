@@ -1,10 +1,10 @@
 // https://github.com/rocker-org/devcontainer-features
 {
 	"name": "My Awesome Report",
-	"build": {
-		"dockerfile": "../Dockerfile",
-		"target": "dev"
-	},
+	// Pull the pre-built base image from ghcr.io instead of building it
+	// locally. The image is published by .github/workflows/publish-image.yml.
+	// Requires the ghcr.io package to be public (or `docker login ghcr.io`).
+	"image": "ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest",
 
 	// Install the `arf` R terminal and R packages for developing in VScode.
 	// Run as a single sequential script (rather than the object form, whose
