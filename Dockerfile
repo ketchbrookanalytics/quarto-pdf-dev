@@ -1,32 +1,45 @@
 # Define the version of R that we'll be using
-ARG R_VERSION=4.5.2
+ARG R_VERSION=4.6.0
 
 # Use the rocker/verse base image to install the specific version of R
 FROM rocker/r-ver:${R_VERSION} AS dev
 
 # Define the versions of the other software dependencies we'll be using
-ARG QUARTO_VERSION=1.8.27
+ARG QUARTO_VERSION=1.9.38
 
-# Install fonts
+# Install fonts, along with the shared libraries that Chrome Headless Shell
+# (installed below) needs at runtime to render mermaid/graphviz diagrams.
 RUN apt-get update && apt-get install --no-install-recommends -y \
     fonts-roboto \
-  && rm -rf /var/lib/apt/lists/*
-
-# Install Chrome
-RUN apt-get update && apt-get install --no-install-recommends -y \
+    fonts-noto-color-emoji \
     wget \
-    gnupg2 \
-  && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
-  && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
-     > /etc/apt/sources.list.d/google-chrome.list \
-  && apt-get update && apt-get install --no-install-recommends -y \
-    google-chrome-stable \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0t64 \
+    libatk-bridge2.0-0t64 \
+    libatspi2.0-0t64 \
+    libdbus-1-3 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libxkbcommon0 \
+    libasound2t64 \
+    libgbm1 \
+    libcups2t64 \
+    libpango-1.0-0 \
+    libcairo2 \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Quarto
-RUN wget -q "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb" \
-  && dpkg -i "quarto-${QUARTO_VERSION}-linux-amd64.deb" \
-  && rm "quarto-${QUARTO_VERSION}-linux-amd64.deb"
+# Install Quarto, along with Chrome Headless Shell - Quarto's purpose-built
+# headless browser (Chrome for Testing) used to render mermaid/graphviz
+# diagrams. It ships native arm64 and amd64 Linux builds and needs no system
+# Chrome/Chromium package, unlike the apt-based Chrome install this replaced.
+ARG TARGETARCH
+RUN wget -q "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb" \
+  && dpkg -i "quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb" \
+  && rm "quarto-${QUARTO_VERSION}-linux-${TARGETARCH}.deb" \
+  && quarto install chrome-headless-shell --no-prompt
 
 # Install the latest version of {pak}
 RUN R -q -e "install.packages('pak')"
@@ -43,7 +56,7 @@ ENV RENV_CONFIG_SANDBOX_ENABLED=false
 ENV RENV_CONFIG_SYNCHRONIZED_CHECK=false
 
 # Define the version of {renv} to install
-ARG RENV_VERSION=1.1.7
+ARG RENV_VERSION=1.2.3
 
 # Install {renv}
 # Note that we won't use {renv} to install packages during development;

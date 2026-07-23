@@ -106,7 +106,7 @@
   align(center)[
       #if author != "" {strong(author); linebreak();}
       #if author-email != "" {link("mailto:" + to-string(author-email)); linebreak();}
-      #if author-phone != "" {author-phone; linebreak();}
+      #if author-phone != "" {to-string(author-phone); linebreak();}
     ]
 
   pagebreak()

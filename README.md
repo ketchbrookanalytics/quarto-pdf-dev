@@ -3,7 +3,7 @@
 This repository provides a template framework for authoring PDF reports with [Quarto](https://quarto.org/) inside of a [devcontainer](https://code.visualstudio.com/docs/devcontainers/containers), as well as deploying them as reproducible software artifacts via [Docker]().
 
 > [!NOTE]
-> This has been tested on both AMD64 and ARM64 architectures. Both the **Development** and **Deployment** steps are working on AMD64. On our ARM64 tests, the **Development** steps are working, but the **Deployment** steps are throwing an error. See [Issue 15](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/15) for more information.
+> This repository has been tested on both AMD64 and ARM64 architectures.
 
 ## Development
 
@@ -49,7 +49,7 @@ As you develop, you'll likely have the need to install additional R packages. In
 
 The devcontainer also offers the following additional features:
 
-- The [arf](https://github.com/eitsupi/arf) R terminal for a friendly R console experience that includes auto-complete and syntax highlighting. 
+- The [arf](https://github.com/eitsupi/arf) R terminal for a friendly R console experience that includes auto-complete and syntax highlighting.
 - Use of [Air](https://posit-dev.github.io/air/) for R code formatting.
 - [Claude Code](https://code.claude.com/docs/en/vs-code) VSCode extension for AI-assisted development.
 
@@ -66,7 +66,7 @@ renv::init(bare = TRUE)   # Answer "y" / "Yes", then restart R
 # Allow {renv} to use the already installed version of {pak}
 renv::hydrate(packages = "pak")   # Answer "Y" / "Yes"
 
-# Enable `renv::dependencies()` (it requires {yaml} be installed) 
+# Enable `renv::dependencies()` (it requires {yaml} be installed)
 renv::install("yaml")
 
 # Discover project R package dependencies
@@ -128,7 +128,7 @@ The middle lines of the above command represent communication between our local 
 This repository contains the following components:
 
 - [_targets/](_targets/) contains [{targets}](https://docs.ropensci.org/targets/) pipeline metadata.
-- [.claude/](.claude/) contains specific instructions and permission settings for Claude Code. 
+- [.claude/](.claude/) contains specific instructions and permission settings for Claude Code.
 - [devcontainer.json](.devcontainer/devcontainer.json) builds upon the [Dockerfile](Dockerfile) by incorporating additional features into the development environment.
 - [assets/](assets/) contains custom [Typst](https://quarto.org/docs/output-formats/typst.html) specifications.
     + [typst-template.typ](assets/typst-template.typ) outlines the [Typst template](https://typst.app/docs/tutorial/making-a-template/) that is used to create the report.

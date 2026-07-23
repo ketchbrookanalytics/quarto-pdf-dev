@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Force LF regardless of platform/core.autocrlf so this script bind-mounted into
+# the (Linux) dev container never gets checked out with CRLF endings.
+.devcontainer/postCreate.sh text eol=lf

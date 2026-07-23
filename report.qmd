@@ -8,6 +8,14 @@ subtitle: With a Really Cool Subtitle
 library(gt)
 ```
 
+## Using Emojis
+
+We like to use the following emojis in many of our reports:
+
+- 🔴 Red
+- 🟡 Yellow
+- 🟢 Green
+
 ## Using {gt} for Tables
 
 {{< include /qmd/_01_tables.qmd >}}
