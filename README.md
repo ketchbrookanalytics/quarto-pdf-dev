@@ -57,7 +57,7 @@ The devcontainer also offers the following additional features:
 
 ### Pre-Deployment Steps
 
-Before you formally handoff your work to someone else, you'll want to use {renv} to lock down the versions of the R packages you used (as evidenced in the `prod` stage of the multi-stage build in the [Dockerfile](Dockerfile)) so that the work is *fully reproducible*. In order to do so, run the following commands in an R terminal:
+Before you formally handoff your work to someone else, you'll want to use {renv} to lock down the versions of the R packages you used (installed via `renv::restore()` in the [Dockerfile](Dockerfile)) so that the work is *fully reproducible*. In order to do so, run the following commands in an R terminal:
 
 ```r
 # Initialize {renv}
@@ -84,7 +84,7 @@ renv::snapshot()
 
 The resulting `renv.lock` file will be used by Docker during build time to install the exact R package dependencies used in the project via `renv::restore()`.
 
-For a *fully* reproducible build, also pin the base image at this point. The `dev` stage of the [Dockerfile](Dockerfile) references `ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest`, which tracks the newest base. Replace `:latest` with the immutable `:sha-...` tag of a specific published base (visible on the [package page](https://github.com/ketchbrookanalytics/quarto-pdf-dev/pkgs/container/quarto-pdf-dev)) so the R/Quarto versions can't drift after handoff.
+For a *fully* reproducible build, also pin the base image at this point. The [Dockerfile](Dockerfile) references `ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest`, which tracks the newest base. Replace `:latest` with the immutable `:sha-...` tag of a specific published base (visible on the [package page](https://github.com/ketchbrookanalytics/quarto-pdf-dev/pkgs/container/quarto-pdf-dev)) so the R/Quarto versions can't drift after handoff.
 
 Commit and push the changes to the repository. You're now ready to hand off this repository to others who want to reproduce your work.
 
@@ -107,10 +107,10 @@ Steps 3 and 4 are further explained below.
 In order to build the Docker image that contains all of the project's dependencies, run the following command from a bash/shell terminal:
 
 ```bash
-docker build --target prod -t ketchbrook/report .
+docker build -t ketchbrook/report .
 ```
 
-The above command builds the *prod* Docker image from the specified `Dockerfile`, and tags it with a name you can use later, such as `ketchbrook/report`.
+The above command builds the deployment Docker image from the specified `Dockerfile`, and tags it with a name you can use later, such as `ketchbrook/report`.
 
 ### Run the Docker Container
 
@@ -140,5 +140,5 @@ This repository contains the following components:
 - [_quarto.yml](_quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/typst.html) Quarto provides for rendering Typst PDF documents, and also passes variables to [typst-show.typ](assets/typst-show.typ) which, in turn, passes values to [typst-template.typ](assets/typst-template.typ).
 - [air.toml](air.toml) instantiates the project's use of [Air](https://posit-dev.github.io/air/) for R code formatting.
 - [Dockerfile.base](Dockerfile.base) defines the reusable `dev` base image (R, Quarto, Chrome Headless Shell, `pak`, `renv`). It is published to `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` by [.github/workflows/publish-image.yml](.github/workflows/publish-image.yml) and is shared, unchanged, across every report project.
-- [Dockerfile](Dockerfile) pulls that published base image as its `dev` stage and adds the project-specific *prod* stage (assets, `qmd/`, `renv::restore()`) used for deployment at the conclusion of the project.
+- [Dockerfile](Dockerfile) builds the project-specific deployment image directly on top of that published base (adding `assets/`, `qmd/`, `renv::restore()`, etc.) at the conclusion of the project.
 - [report.qmd](report.qmd) is an example Quarto report that showcases how to include tables, plots, and diagrams.

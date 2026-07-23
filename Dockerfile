@@ -6,10 +6,7 @@
 # pin this to an immutable digest tag (e.g. ":sha-abc1234"); the publish
 # workflow tags every build with its commit SHA. Do this at handoff, alongside
 # locking renv.lock (see the README's "Pre-Deployment Steps").
-FROM ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest AS dev
-
-# Build upon the dev image (called by the devcontainer) & add prod instructions
-FROM dev AS prod
+FROM ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest
 
 # Set the working directory for the project
 WORKDIR /project
