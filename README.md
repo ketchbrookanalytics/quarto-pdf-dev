@@ -22,7 +22,7 @@ If you don't see the popup, you can also reopen in container via the VSCode Comm
 - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the Command Palette.
 - Search for "Dev Containers: Reopen in Container" and select it.
 
-This will build the Docker image locally (which will take a few minutes the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would! If you make changes to any of the files in the [.devcontainer/](.devcontainer/) directory, you will need to rebuild the image.
+This will pull the pre-built base image from `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` (which will take a minute the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would! If you make changes to any of the files in the [.devcontainer/](.devcontainer/) directory, you will need to rebuild the container.
 
 ### Why Devcontainers?
 
@@ -84,6 +84,8 @@ renv::snapshot()
 
 The resulting `renv.lock` file will be used by Docker during build time to install the exact R package dependencies used in the project via `renv::restore()`.
 
+For a *fully* reproducible build, also pin the base image at this point. The `dev` stage of the [Dockerfile](Dockerfile) references `ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest`, which tracks the newest base. Replace `:latest` with the immutable `:sha-...` tag of a specific published base (visible on the [package page](https://github.com/ketchbrookanalytics/quarto-pdf-dev/pkgs/container/quarto-pdf-dev)) so the R/Quarto versions can't drift after handoff.
+
 Commit and push the changes to the repository. You're now ready to hand off this repository to others who want to reproduce your work.
 
 ## Reproduction
@@ -137,5 +139,6 @@ This repository contains the following components:
 - [qmd/](qmd/) contains the [Quarto child documents](https://quarto.org/docs/authoring/includes.html) that make up most of the report narrative and detail.
 - [_quarto.yml](_quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/typst.html) Quarto provides for rendering Typst PDF documents, and also passes variables to [typst-show.typ](assets/typst-show.typ) which, in turn, passes values to [typst-template.typ](assets/typst-template.typ).
 - [air.toml](air.toml) instantiates the project's use of [Air](https://posit-dev.github.io/air/) for R code formatting.
-- [Dockerfile](Dockerfile) serves as the base Docker image that [devcontainer.json](.devcontainer/devcontainer.json) builds upon, as well as additional *prod* dependencies for deployment purposes at the conclusion of the project. It contains the major dependencies (R, Quarto, and Chrome) needed for the project.
+- [Dockerfile.base](Dockerfile.base) defines the reusable `dev` base image (R, Quarto, Chrome Headless Shell, `pak`, `renv`). It is published to `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` by [.github/workflows/publish-image.yml](.github/workflows/publish-image.yml) and is shared, unchanged, across every report project.
+- [Dockerfile](Dockerfile) pulls that published base image as its `dev` stage and adds the project-specific *prod* stage (assets, `qmd/`, `renv::restore()`) used for deployment at the conclusion of the project.
 - [report.qmd](report.qmd) is an example Quarto report that showcases how to include tables, plots, and diagrams.
