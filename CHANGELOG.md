@@ -28,11 +28,13 @@ Dependency stack: **R 4.5.2**, **Quarto 1.9.38**, **`{renv}` 1.2.3**
   build that assembles but can't actually render fails in CI rather than in
   someone's devcontainer. The render covers `{pak}`, the knitr engine, Quarto's
   Typst backend, Chrome Headless Shell (the mermaid diagrams), and the Roboto and
-  emoji fonts. Every run tests `linux/amd64`; scheduled and release runs also
-  test `linux/arm64`, so the architecture that reaches Apple Silicon
-  devcontainers is exercised before anyone pins it. Each architecture runs on a
-  native runner rather than through the QEMU layer used to build it, because
-  Chrome Headless Shell cannot render under emulation.
+  emoji fonts. Both `linux/amd64` and `linux/arm64` are tested on every build,
+  each on a native runner rather than through the QEMU layer used to build them,
+  because Chrome Headless Shell cannot render under emulation.
+- The smoke test gates publication. The build pushes only a `sha-` tag; `latest`
+  and the semver tags are moved onto that image by a separate `promote` job once
+  both architectures have rendered the report, so a build that can't render never
+  becomes anyone's `latest`.
 - Multi-architecture base image (`linux/amd64` and `linux/arm64`), built with
   QEMU + Buildx.
 - Chrome Headless Shell, installed via `quarto install`, so mermaid and graphviz

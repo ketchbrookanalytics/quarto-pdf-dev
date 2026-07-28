@@ -148,10 +148,12 @@ The base image at `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` carries four kind
 
 The [devcontainer](.devcontainer/) and an in-flight project's [Dockerfile](Dockerfile) should stay on `:latest`, so ongoing work picks up patches. Pin to `vX.Y.Z` only at handoff, alongside locking `renv.lock`.
 
+`latest` and the semver tags are only applied *after* the smoke test passes on both architectures, so a build that can't render never becomes anyone's `latest` — it just leaves those tags on the previous image. `sha-` tags are the exception: they are pushed before the test runs, so one exists for every build including failed ones. Pin a released `vX.Y.Z`, not a `sha-`.
+
 > [!NOTE]
 > The weekly rebuild runs cache-less on purpose, so it takes on the order of ten minutes rather than seconds. A scheduled run that finishes in well under a minute means the cache is being restored and **no patches are landing** — the manifest digest still changes every week regardless, because of the image's `created` timestamp label, so digest churn is not evidence of a real rebuild.
 >
-> Every published image is smoke-tested by rendering [report.qmd](report.qmd) inside it ([.github/scripts/smoke-test.sh](.github/scripts/smoke-test.sh)). Pushes to `main` test `linux/amd64`; the weekly and release runs also test `linux/arm64`, each on a native runner. The same script is a handy way to reproduce a suspected image problem locally:
+> Every build is smoke-tested by rendering [report.qmd](report.qmd) inside the image ([.github/scripts/smoke-test.sh](.github/scripts/smoke-test.sh)), on `linux/amd64` and `linux/arm64`, each on a native runner. The same script is a handy way to reproduce a suspected image problem locally:
 >
 > ```bash
 > docker run --rm -v "$PWD:/project" -w /project \
@@ -176,7 +178,7 @@ A revert counts as a change: moving R back down is a **minor** bump forward, not
 ### Cutting a release
 
 1. Move the `## [Unreleased]` entries in [CHANGELOG.md](CHANGELOG.md) under a new `## [X.Y.Z] - YYYY-MM-DD` heading, confirm the dependency-stack line at the top of the section matches [Dockerfile.base](Dockerfile.base), and update the link definitions at the bottom of the file.
-2. Merge to `main` and wait for the [publish workflow](.github/workflows/publish-image.yml) to push a fresh `latest`.
+2. Merge to `main` and wait for the [publish workflow](.github/workflows/publish-image.yml) to go green. Its three jobs run in order: `publish` builds and pushes the `sha-` tag, `smoke` renders the report on both architectures, and `promote` then moves `latest`. If `smoke` fails, nothing is promoted — fix the image before releasing.
 3. Publish the release, which triggers the workflow again to stamp the semver tags:
 
     ```bash

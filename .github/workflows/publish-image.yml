@@ -62,23 +62,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # This job pushes ONLY the sha- tag. The user-facing tags (latest and the
+      # semver lines) are applied by the `promote` job, after the smoke test
+      # passes, so a broken image can never become anyone's `latest`. Tagging
+      # scheme, in full, is in the README's "Versioning & Releases".
+      #
+      # Consequence worth knowing: a sha- tag exists for every build, including
+      # ones that fail the smoke test. Pinning a sha- tag means pinning something
+      # possibly untested -- pin a released vX.Y.Z instead.
       - name: Extract image metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/ketchbrookanalytics/quarto-pdf-dev
-          # Tagging scheme (see the README's "Versioning & Releases"):
-          #   0.2.0 / v0.2.0 - immutable release pin; what handoffs should use
-          #   0.2            - floating minor line; picks up patch re-releases
-          #   latest         - rolling build of main, incl. weekly OS patches
-          #   sha-<commit>   - every build, for tracing an image to a commit
-          # The semver entries are no-ops unless the ref is a "vX.Y.Z" tag.
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern=v{{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
+          tags: type=sha
 
       - name: Build and push
         id: build
@@ -113,15 +110,11 @@ jobs:
           cache-to: type=gha,mode=max
 
   # A green build only proves the image assembled, not that anyone can use it.
-  # Render the example report inside the image that was just published, pulled
-  # back by digest so this tests the exact artifact users pull rather than a
+  # Render the example report inside the image that was just pushed, pulled back
+  # by digest so this tests the exact artifact users will pull rather than a
   # separate local build. See .github/scripts/smoke-test.sh for what the render
-  # covers.
-  #
-  # This runs after the push, so it detects a broken image rather than
-  # preventing one: `latest` will already have moved. Gating the promotion of
-  # `latest` on it would mean pushing only the `sha-` tag from the job above and
-  # promoting with `docker buildx imagetools create` once this job passes.
+  # covers. This job gates `promote` below, so a failure here leaves `latest`
+  # pointing at the last image that did pass.
   smoke:
     needs: publish
     permissions:
@@ -138,18 +131,22 @@ jobs:
     # of the second one inheriting built targets and a rendered PDF from the
     # first.
     #
-    # arm64 joins the matrix only on scheduled and release runs -- the runs whose
-    # output reaches a devcontainer or gets pinned at handoff. Pushes to main
-    # keep fast amd64-only feedback. Unlike the `cache-from` expression above,
-    # both branches here are non-empty strings, so `cond && A || B` is safe.
+    # Both architectures run on every build. Native arm64 runners are free for
+    # public repositories and no slower than amd64, so there is nothing to save
+    # by testing only one -- and since this job now gates promotion, testing one
+    # architecture would mean promoting `latest` for an architecture nobody
+    # checked.
+    #
+    # fail-fast is off so a single-architecture failure still reports the other
+    # one's result; either failure blocks promotion.
     strategy:
       fail-fast: false
-      matrix: >-
-        ${{ fromJSON(
-          (github.event_name == 'schedule' || github.event_name == 'release')
-          && '{"include":[{"arch":"amd64","runner":"ubuntu-latest"},{"arch":"arm64","runner":"ubuntu-24.04-arm"}]}'
-          || '{"include":[{"arch":"amd64","runner":"ubuntu-latest"}]}'
-        ) }}
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Check out the repository
@@ -165,3 +162,74 @@ jobs:
             --workdir /project \
             "$IMAGE" \
             bash .github/scripts/smoke-test.sh
+
+  # Only now, with both architectures proven to render, do the tags anyone
+  # actually pulls start pointing at this build. `imagetools create` copies the
+  # existing multi-arch index (attestations included) under new tags -- it is a
+  # registry-side manifest operation, so nothing is rebuilt or re-uploaded.
+  #
+  # Because this job is what moves `latest`, a smoke-test failure leaves users on
+  # the last image that passed. The trade-off is that `latest` lags a failing
+  # build rather than tracking HEAD, which is the point.
+  promote:
+    needs: [publish, smoke]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # The semver entries are no-ops unless the ref is a "vX.Y.Z" tag, and
+      # `latest` only applies on the default branch -- so a release run promotes
+      # the version tags and a push to main promotes `latest`.
+      - name: Work out which tags to promote
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/ketchbrookanalytics/quarto-pdf-dev
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Promote the tested image
+        env:
+          # Newline-separated, passed through the environment rather than
+          # interpolated into the script, so tag values can't break quoting.
+          TAGS: ${{ steps.meta.outputs.tags }}
+          SOURCE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ needs.publish.outputs.digest }}
+        run: |
+          tags=()
+          while IFS= read -r tag; do
+            # An `if` rather than `[ -n "$tag" ] && ...`: the && form returns
+            # non-zero on the blank line, and these steps run under `bash -e`.
+            if [ -n "$tag" ]; then
+              tags+=("$tag")
+            fi
+          done <<< "$TAGS"
+
+          # Nothing to promote when neither rule matched -- e.g. a manual run on
+          # a non-default branch, which should stay reachable only by sha- tag.
+          if [ "${#tags[@]}" -eq 0 ]; then
+            echo "No promotion tags for this ref; leaving the sha- tag as the only reference."
+            exit 0
+          fi
+
+          args=()
+          for tag in "${tags[@]}"; do
+            args+=(--tag "$tag")
+          done
+
+          docker buildx imagetools create "${args[@]}" "$SOURCE"
+          echo "Promoted $SOURCE to:"
+          printf '  %s\n' "${tags[@]}"
