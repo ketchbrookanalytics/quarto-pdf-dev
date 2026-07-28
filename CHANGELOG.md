@@ -28,7 +28,9 @@ Dependency stack: **R 4.5.2**, **Quarto 1.9.38**, **`{renv}` 1.2.3**
   build that assembles but can't actually render fails in CI rather than in
   someone's devcontainer. The render covers `{pak}`, the knitr engine, Quarto's
   Typst backend, Chrome Headless Shell (the mermaid diagrams), and the Roboto and
-  emoji fonts.
+  emoji fonts. Every run tests `linux/amd64`; scheduled and release runs also
+  test `linux/arm64` through QEMU, so the architecture that reaches Apple Silicon
+  devcontainers is exercised before anyone pins it.
 - Multi-architecture base image (`linux/amd64` and `linux/arm64`), built with
   QEMU + Buildx.
 - Chrome Headless Shell, installed via `quarto install`, so mermaid and graphviz
