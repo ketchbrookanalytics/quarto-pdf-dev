@@ -71,6 +71,7 @@ jobs:
             type=sha
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -100,3 +101,27 @@ jobs:
           cache-from: ${{ github.event_name != 'schedule' && 'type=gha' || '' }}
           # Always export, so the next push build starts from patched layers.
           cache-to: type=gha,mode=max
+
+      # A green build only proves the image assembled, not that anyone can use
+      # it. Render the example report inside the image we just published --
+      # pulled back by digest, so this tests the exact artifact users pull, not
+      # a separate local build. See .github/scripts/smoke-test.sh for what the
+      # render covers.
+      #
+      # This runs after the push, so it detects a broken image rather than
+      # preventing one: `latest` will already have moved. Gating the promotion
+      # of `latest` on this step would mean pushing only the `sha-` tag here and
+      # promoting with `docker buildx imagetools create` once the test passes.
+      #
+      # Only the runner's own architecture (amd64) is exercised. The arm64
+      # variant could be tested through the QEMU layer set up above, but
+      # installing R packages under emulation is slow enough to not be worth it.
+      - name: Smoke-test the published image
+        env:
+          IMAGE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ steps.build.outputs.digest }}
+        run: |
+          docker run --rm \
+            --volume "$PWD:/project" \
+            --workdir /project \
+            "$IMAGE" \
+            bash .github/scripts/smoke-test.sh
