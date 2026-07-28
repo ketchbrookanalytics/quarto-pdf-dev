@@ -84,7 +84,13 @@ renv::snapshot()
 
 The resulting `renv.lock` file will be used by Docker during build time to install the exact R package dependencies used in the project via `renv::restore()`.
 
-For a *fully* reproducible build, also pin the base image at this point. The [Dockerfile](Dockerfile) references `ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest`, which tracks the newest base. Replace `:latest` with the immutable `:sha-...` tag of a specific published base (visible on the [package page](https://github.com/ketchbrookanalytics/quarto-pdf-dev/pkgs/container/quarto-pdf-dev)) so the R/Quarto versions can't drift after handoff.
+For a *fully* reproducible build, also pin the base image at this point. The [Dockerfile](Dockerfile) references `ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest`, which tracks the newest base. Replace `:latest` with a released version tag so the R/Quarto versions can't drift after handoff:
+
+```dockerfile
+FROM ghcr.io/ketchbrookanalytics/quarto-pdf-dev:v0.2.0
+```
+
+Available tags are listed on the [package page](https://github.com/ketchbrookanalytics/quarto-pdf-dev/pkgs/container/quarto-pdf-dev), and each release's dependency stack is recorded in [CHANGELOG.md](CHANGELOG.md). See [Versioning & Releases](#versioning--releases) below for what the tags mean.
 
 Commit and push the changes to the repository. You're now ready to hand off this repository to others who want to reproduce your work.
 
@@ -125,6 +131,45 @@ The middle lines of the above command represent communication between our local 
 - `-v "$(pwd)/data:/project/data:ro"` allows the container "Read-only" access to the local folder named `data/` in the current working directory. This is only necessary if you have a git-ignored folder called `data/` locally.
 - `-v "$(pwd)/_output:/project/_output"` allows the container to write to a folder (which may or may not already exist; if it doesn't exist, it will be created) named `_output/` in the current working directory.
 
+## Versioning & Releases
+
+This template's real product is a *pinned dependency stack* — a specific R version, a specific Quarto version, and the tooling around them. Those dependencies get updated periodically, and occasionally an update has to be walked back (as with the R 4.6.0 → 4.5.2 revert in [#20](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/20)). Releases exist so a project handed off six months ago can name the exact stack it was built against.
+
+### Image tags
+
+The base image at `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` carries four kinds of tag:
+
+| Tag | Moves? | Use it for |
+| --- | --- | --- |
+| `v0.2.0`, `0.2.0` | Never | **Handoffs.** Pins one exact dependency stack. |
+| `0.2` | On patch re-releases | Tracking fixes within a minor line. |
+| `latest` | Every build of `main`, including the weekly rebuild | **Active development.** Gets OS/security patches automatically. |
+| `sha-abc1234` | Never | Tracing a specific image back to a commit. |
+
+The [devcontainer](.devcontainer/) and an in-flight project's [Dockerfile](Dockerfile) should stay on `:latest`, so ongoing work picks up patches. Pin to `vX.Y.Z` only at handoff, alongside locking `renv.lock`.
+
+### What bumps which number
+
+| Change | Bump |
+| --- | --- |
+| A dependency change that can invalidate an existing `renv.lock` — an R minor-version jump (`4.5.x` → `4.6.x`), which changes the binary package line | **Major** |
+| Anything else that changes the dependency stack: R patch versions, Quarto versions, `{renv}` versions, new system libraries, new devcontainer tooling | **Minor** |
+| Docs, workflow plumbing, Typst/template tweaks, and fixes that leave the dependency stack untouched | **Patch** |
+
+A revert counts as a change: moving R back down is a **minor** bump forward, not a rollback to an older version number.
+
+### Cutting a release
+
+1. Move the `## [Unreleased]` entries in [CHANGELOG.md](CHANGELOG.md) under a new `## [X.Y.Z] - YYYY-MM-DD` heading, confirm the dependency-stack line at the top of the section matches [Dockerfile.base](Dockerfile.base), and update the link definitions at the bottom of the file.
+2. Merge to `main` and wait for the [publish workflow](.github/workflows/publish-image.yml) to push a fresh `latest`.
+3. Publish the release, which triggers the workflow again to stamp the semver tags:
+
+    ```bash
+    gh release create vX.Y.Z --title vX.Y.Z --notes "See CHANGELOG.md for details."
+    ```
+
+4. Confirm the new tags appear on the [package page](https://github.com/ketchbrookanalytics/quarto-pdf-dev/pkgs/container/quarto-pdf-dev).
+
 ## Structure
 
 This repository contains the following components:
@@ -139,6 +184,7 @@ This repository contains the following components:
 - [qmd/](qmd/) contains the [Quarto child documents](https://quarto.org/docs/authoring/includes.html) that make up most of the report narrative and detail.
 - [_quarto.yml](_quarto.yml) specifies the different [options](https://quarto.org/docs/reference/formats/typst.html) Quarto provides for rendering Typst PDF documents, and also passes variables to [typst-show.typ](assets/typst-show.typ) which, in turn, passes values to [typst-template.typ](assets/typst-template.typ).
 - [air.toml](air.toml) instantiates the project's use of [Air](https://posit-dev.github.io/air/) for R code formatting.
+- [CHANGELOG.md](CHANGELOG.md) records what changed in each release of the template, including the R/Quarto/`{renv}` versions that release ships.
 - [Dockerfile.base](Dockerfile.base) defines the reusable `dev` base image (R, Quarto, Chrome Headless Shell, `pak`, `renv`). It is published to `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` by [.github/workflows/publish-image.yml](.github/workflows/publish-image.yml) and is shared, unchanged, across every report project.
 - [Dockerfile](Dockerfile) builds the project-specific deployment image directly on top of that published base (adding `assets/`, `qmd/`, `renv::restore()`, etc.) at the conclusion of the project.
 - [report.qmd](report.qmd) is an example Quarto report that showcases how to include tables, plots, and diagrams.

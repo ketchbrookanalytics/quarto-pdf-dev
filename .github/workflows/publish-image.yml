@@ -11,6 +11,12 @@ on:
       # Rebuild when the base definition or this workflow changes.
       - Dockerfile.base
       - .github/workflows/publish-image.yml
+  # Publishing a GitHub Release (tagged "vX.Y.Z") stamps the image with
+  # immutable semver tags. This is a `release` trigger rather than a `push` tag
+  # filter on purpose: the `paths` filter above would otherwise also apply to
+  # tag pushes and silently skip releases that don't touch Dockerfile.base.
+  release:
+    types: [published]
   # Allow manual rebuilds (e.g. to publish a fresh base without a code change).
   workflow_dispatch:
   # Weekly rebuild so OS/security patches in the base layers stay current.
@@ -51,7 +57,16 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/ketchbrookanalytics/quarto-pdf-dev
+          # Tagging scheme (see the README's "Versioning & Releases"):
+          #   0.2.0 / v0.2.0 - immutable release pin; what handoffs should use
+          #   0.2            - floating minor line; picks up patch re-releases
+          #   latest         - rolling build of main, incl. weekly OS patches
+          #   sha-<commit>   - every build, for tracing an image to a commit
+          # The semver entries are no-ops unless the ref is a "vX.Y.Z" tag.
           tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha
 
