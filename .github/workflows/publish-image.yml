@@ -145,6 +145,7 @@ jobs:
         include:
           - arch: amd64
             runner: ubuntu-latest
+            # Currently, ARM64 runners are version-pinned (there's no `ubuntu-latest` available)
           - arch: arm64
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
