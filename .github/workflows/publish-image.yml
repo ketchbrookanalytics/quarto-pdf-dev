@@ -32,6 +32,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # Consumed by the `smoke` job below, so it tests this exact build rather
+    # than whatever `latest` happens to point at by the time it runs.
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
@@ -39,6 +43,12 @@ jobs:
       # QEMU + Buildx are required to build the arm64 image on an amd64 runner.
       # The base is multi-arch (see TARGETARCH in Dockerfile.base); without
       # these steps we would silently publish an amd64-only image.
+      #
+      # Emulation is fine for *building* -- apt, the Quarto .deb, and the R
+      # package installs all work under QEMU. It is only Chrome at runtime that
+      # doesn't, which is why the `smoke` job below uses native runners instead.
+      # Splitting the build across a native runner per architecture and merging
+      # the manifests would be faster still, but that is a larger change.
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
 
@@ -102,65 +112,55 @@ jobs:
           # Always export, so the next push build starts from patched layers.
           cache-to: type=gha,mode=max
 
-      # A green build only proves the image assembled, not that anyone can use
-      # it. Render the example report inside the image we just published --
-      # pulled back by digest, so this tests the exact artifact users pull, not
-      # a separate local build. See .github/scripts/smoke-test.sh for what the
-      # render covers.
-      #
-      # This runs after the push, so it detects a broken image rather than
-      # preventing one: `latest` will already have moved. Gating the promotion
-      # of `latest` on this step would mean pushing only the `sha-` tag here and
-      # promoting with `docker buildx imagetools create` once the test passes.
-      - name: Smoke-test the published image (amd64)
-        timeout-minutes: 20
-        env:
-          IMAGE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ steps.build.outputs.digest }}
-        run: |
-          docker run --rm \
-            --platform linux/amd64 \
-            --volume "$PWD:/project" \
-            --workdir /project \
-            "$IMAGE" \
-            bash .github/scripts/smoke-test.sh
+  # A green build only proves the image assembled, not that anyone can use it.
+  # Render the example report inside the image that was just published, pulled
+  # back by digest so this tests the exact artifact users pull rather than a
+  # separate local build. See .github/scripts/smoke-test.sh for what the render
+  # covers.
+  #
+  # This runs after the push, so it detects a broken image rather than
+  # preventing one: `latest` will already have moved. Gating the promotion of
+  # `latest` on it would mean pushing only the `sha-` tag from the job above and
+  # promoting with `docker buildx imagetools create` once this job passes.
+  smoke:
+    needs: publish
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    # Each architecture tests on its own native runner, not through the QEMU
+    # layer the build uses. That is not a preference: rendering under emulation
+    # dies where Quarto drives Chrome Headless Shell ("AssertionError ... Child
+    # process has already terminated"), while the identical render with the
+    # mermaid diagrams removed passes, so the emulation layer breaks Chrome, not
+    # the arm64 image. Public repositories get ubuntu-24.04-arm runners at no
+    # cost, so test on real hardware rather than working around QEMU. Separate
+    # runners also mean each architecture starts from a clean workspace, instead
+    # of the second one inheriting built targets and a rendered PDF from the
+    # first.
+    #
+    # arm64 joins the matrix only on scheduled and release runs -- the runs whose
+    # output reaches a devcontainer or gets pinned at handoff. Pushes to main
+    # keep fast amd64-only feedback. Unlike the `cache-from` expression above,
+    # both branches here are non-empty strings, so `cond && A || B` is safe.
+    strategy:
+      fail-fast: false
+      matrix: >-
+        ${{ fromJSON(
+          (github.event_name == 'schedule' || github.event_name == 'release')
+          && '{"include":[{"arch":"amd64","runner":"ubuntu-latest"},{"arch":"arm64","runner":"ubuntu-24.04-arm"}]}'
+          || '{"include":[{"arch":"amd64","runner":"ubuntu-latest"}]}'
+        ) }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
 
-      # The amd64 run leaves root-owned build products in the workspace. Clear
-      # them from inside a container, since the runner user can't delete files
-      # owned by root, so the arm64 run below genuinely rebuilds: a populated
-      # _targets/objects/ would make the pre-render hook skip tar_make() (losing
-      # the {gt} and {ggplot2} coverage that is much of the point of testing the
-      # second architecture), and a leftover report.pdf could let a render that
-      # produced nothing still satisfy the script's assertions.
-      - name: Reset the workspace between architectures
-        if: github.event_name == 'schedule' || github.event_name == 'release'
+      - name: Render report.qmd inside the published image
         env:
-          IMAGE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ steps.build.outputs.digest }}
+          IMAGE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ needs.publish.outputs.digest }}
         run: |
           docker run --rm \
-            --platform linux/amd64 \
-            --volume "$PWD:/project" \
-            --workdir /project \
-            "$IMAGE" \
-            rm -rf _output .quarto _targets/objects
-
-      # Same test, same script, arm64 -- through the QEMU layer set up above.
-      # Restricted to scheduled and release runs: pushes to main already get
-      # amd64 coverage for fast feedback, and these are the runs whose output
-      # actually reaches a devcontainer or gets pinned at handoff.
-      #
-      # Emulation is the whole cost here, not compilation: P3M serves prebuilt
-      # aarch64 binaries for noble, so pak installs are downloads on both
-      # architectures. The slow, and most failure-prone, part is Chrome Headless
-      # Shell rendering the mermaid diagrams under QEMU -- hence the timeout, so
-      # a hang fails the job instead of burning the runner's full allowance.
-      - name: Smoke-test the published image (arm64)
-        if: github.event_name == 'schedule' || github.event_name == 'release'
-        timeout-minutes: 45
-        env:
-          IMAGE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ steps.build.outputs.digest }}
-        run: |
-          docker run --rm \
-            --platform linux/arm64 \
+            --platform linux/${{ matrix.arch }} \
             --volume "$PWD:/project" \
             --workdir /project \
             "$IMAGE" \

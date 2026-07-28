@@ -151,13 +151,15 @@ The [devcontainer](.devcontainer/) and an in-flight project's [Dockerfile](Docke
 > [!NOTE]
 > The weekly rebuild runs cache-less on purpose, so it takes on the order of ten minutes rather than seconds. A scheduled run that finishes in well under a minute means the cache is being restored and **no patches are landing** — the manifest digest still changes every week regardless, because of the image's `created` timestamp label, so digest churn is not evidence of a real rebuild.
 >
-> Every published image is smoke-tested by rendering [report.qmd](report.qmd) inside it ([.github/scripts/smoke-test.sh](.github/scripts/smoke-test.sh)). Pushes to `main` test `linux/amd64` only; the weekly and release runs also test `linux/arm64` under emulation, which is why those runs take substantially longer. The same script is a handy way to reproduce a suspected image problem locally:
+> Every published image is smoke-tested by rendering [report.qmd](report.qmd) inside it ([.github/scripts/smoke-test.sh](.github/scripts/smoke-test.sh)). Pushes to `main` test `linux/amd64`; the weekly and release runs also test `linux/arm64`, each on a native runner. The same script is a handy way to reproduce a suspected image problem locally:
 >
 > ```bash
 > docker run --rm -v "$PWD:/project" -w /project \
 >   ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest \
 >   bash .github/scripts/smoke-test.sh
 > ```
+>
+> Add `--platform linux/arm64` to reproduce an arm64 problem, but do it on arm64 hardware. Under QEMU emulation the render fails when Quarto drives Chrome Headless Shell (`AssertionError` … `Child process has already terminated`) even when the image itself is fine — the identical render passes with the mermaid diagrams removed. That is why CI smoke-tests arm64 on a native runner rather than through the emulation layer it builds with.
 >
 > Note what the weekly rebuild does *not* refresh: packages baked into the `rocker/r-ver` parent image stay frozen until either Rocker republishes that tag or we bump `R_VERSION`. Only the layers `Dockerfile.base` builds itself — the `apt-get` installs, Quarto, Chrome Headless Shell, `{pak}`, `{renv}` — get picked up fresh.
 
