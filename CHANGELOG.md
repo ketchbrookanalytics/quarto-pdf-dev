@@ -53,6 +53,12 @@ Dependency stack: **R 4.5.2**, **Quarto 1.9.38**, **`{renv}` 1.2.3**
 
 - `View()` on a `{gt}` table no longer errors with "unable to start data viewer"
   in the devcontainer (see the R revert above).
+- The weekly base-image rebuild now actually rebuilds. It was restoring every
+  layer from the GitHub Actions cache -- `apt-get install` included -- and
+  finishing in 33 seconds, so no OS/security patch ever reached the published
+  image despite the manifest digest changing each week. Scheduled runs now build
+  cache-less, which also verifies the base still builds from scratch the way a
+  new user builds it. Push and manual builds keep the cache.
 - `arf` and the REditorSupport extension now share a session, so objects created
   in the `arf` terminal appear in the VSCode R workspace viewer.
 - `arf` and `pak::pkg_install()` no longer run in parallel during

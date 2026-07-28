@@ -79,5 +79,24 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
+          # The weekly run must build from scratch. With the cache enabled it
+          # restored every layer -- including `apt-get install` -- and finished in
+          # 33s, so no OS/security patches ever landed and the "rebuild" only
+          # republished the same layers under a fresh timestamp label. Building
+          # cache-less also re-validates that the base builds the way a brand-new
+          # user builds it: if an external download (the Quarto .deb, an apt
+          # package) stops resolving, the weekly run fails loudly instead of
+          # sailing through on cached layers while `latest` quietly rots.
+          #
+          # Push and manual builds keep the cache, where fast iteration on
+          # Dockerfile.base matters more than freshness.
+          no-cache: ${{ github.event_name == 'schedule' }}
+          # Re-resolve rocker/r-ver rather than trusting a cached parent.
+          pull: ${{ github.event_name == 'schedule' }}
+          # `no-cache` already suppresses cache imports; set explicitly so the
+          # intent survives future edits. Note the inverted condition -- an
+          # expression of the form `cond && '' || 'x'` always yields 'x', since
+          # the empty string is falsy.
+          cache-from: ${{ github.event_name != 'schedule' && 'type=gha' || '' }}
+          # Always export, so the next push build starts from patched layers.
           cache-to: type=gha,mode=max

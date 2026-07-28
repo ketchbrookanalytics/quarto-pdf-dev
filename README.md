@@ -148,6 +148,11 @@ The base image at `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` carries four kind
 
 The [devcontainer](.devcontainer/) and an in-flight project's [Dockerfile](Dockerfile) should stay on `:latest`, so ongoing work picks up patches. Pin to `vX.Y.Z` only at handoff, alongside locking `renv.lock`.
 
+> [!NOTE]
+> The weekly rebuild runs cache-less on purpose, so it takes ~8 minutes rather than seconds. A scheduled run that finishes in well under a minute means the cache is being restored and **no patches are landing** — the manifest digest still changes every week regardless, because of the image's `created` timestamp label, so digest churn is not evidence of a real rebuild.
+>
+> Note also what the weekly rebuild does *not* refresh: packages baked into the `rocker/r-ver` parent image stay frozen until either Rocker republishes that tag or we bump `R_VERSION`. Only the layers `Dockerfile.base` builds itself — the `apt-get` installs, Quarto, Chrome Headless Shell, `{pak}`, `{renv}` — get picked up fresh.
+
 ### What bumps which number
 
 | Change | Bump |
