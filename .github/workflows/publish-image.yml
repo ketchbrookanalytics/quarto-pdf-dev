@@ -11,6 +11,12 @@ on:
       # Rebuild when the base definition or this workflow changes.
       - Dockerfile.base
       - .github/workflows/publish-image.yml
+  # Publishing a GitHub Release (tagged "vX.Y.Z") stamps the image with
+  # immutable semver tags. This is a `release` trigger rather than a `push` tag
+  # filter on purpose: the `paths` filter above would otherwise also apply to
+  # tag pushes and silently skip releases that don't touch Dockerfile.base.
+  release:
+    types: [published]
   # Allow manual rebuilds (e.g. to publish a fresh base without a code change).
   workflow_dispatch:
   # Weekly rebuild so OS/security patches in the base layers stay current.
@@ -26,6 +32,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # Consumed by the `smoke` job below, so it tests this exact build rather
+    # than whatever `latest` happens to point at by the time it runs.
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
@@ -33,6 +43,12 @@ jobs:
       # QEMU + Buildx are required to build the arm64 image on an amd64 runner.
       # The base is multi-arch (see TARGETARCH in Dockerfile.base); without
       # these steps we would silently publish an amd64-only image.
+      #
+      # Emulation is fine for *building* -- apt, the Quarto .deb, and the R
+      # package installs all work under QEMU. It is only Chrome at runtime that
+      # doesn't, which is why the `smoke` job below uses native runners instead.
+      # Splitting the build across a native runner per architecture and merging
+      # the manifests would be faster still, but that is a larger change.
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
 
@@ -46,16 +62,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # This job pushes ONLY the sha- tag. The user-facing tags (latest and the
+      # semver lines) are applied by the `promote` job, after the smoke test
+      # passes, so a broken image can never become anyone's `latest`. Tagging
+      # scheme, in full, is in the README's "Versioning & Releases".
+      #
+      # Consequence worth knowing: a sha- tag exists for every build, including
+      # ones that fail the smoke test. Pinning a sha- tag means pinning something
+      # possibly untested -- pin a released vX.Y.Z instead.
       - name: Extract image metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/ketchbrookanalytics/quarto-pdf-dev
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=sha
+          tags: type=sha
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -64,5 +87,150 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
+          # The weekly run must build from scratch. With the cache enabled it
+          # restored every layer -- including `apt-get install` -- and finished in
+          # 33s, so no OS/security patches ever landed and the "rebuild" only
+          # republished the same layers under a fresh timestamp label. Building
+          # cache-less also re-validates that the base builds the way a brand-new
+          # user builds it: if an external download (the Quarto .deb, an apt
+          # package) stops resolving, the weekly run fails loudly instead of
+          # sailing through on cached layers while `latest` quietly rots.
+          #
+          # Push and manual builds keep the cache, where fast iteration on
+          # Dockerfile.base matters more than freshness.
+          no-cache: ${{ github.event_name == 'schedule' }}
+          # Re-resolve rocker/r-ver rather than trusting a cached parent.
+          pull: ${{ github.event_name == 'schedule' }}
+          # `no-cache` already suppresses cache imports; set explicitly so the
+          # intent survives future edits. Note the inverted condition -- an
+          # expression of the form `cond && '' || 'x'` always yields 'x', since
+          # the empty string is falsy.
+          cache-from: ${{ github.event_name != 'schedule' && 'type=gha' || '' }}
+          # Always export, so the next push build starts from patched layers.
           cache-to: type=gha,mode=max
+
+  # A green build only proves the image assembled, not that anyone can use it.
+  # Render the example report inside the image that was just pushed, pulled back
+  # by digest so this tests the exact artifact users will pull rather than a
+  # separate local build. See .github/scripts/smoke-test.sh for what the render
+  # covers. This job gates `promote` below, so a failure here leaves `latest`
+  # pointing at the last image that did pass.
+  smoke:
+    needs: publish
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    # Each architecture tests on its own native runner, not through the QEMU
+    # layer the build uses. That is not a preference: rendering under emulation
+    # dies where Quarto drives Chrome Headless Shell ("AssertionError ... Child
+    # process has already terminated"), while the identical render with the
+    # mermaid diagrams removed passes, so the emulation layer breaks Chrome, not
+    # the arm64 image. Public repositories get ubuntu-24.04-arm runners at no
+    # cost, so test on real hardware rather than working around QEMU. Separate
+    # runners also mean each architecture starts from a clean workspace, instead
+    # of the second one inheriting built targets and a rendered PDF from the
+    # first.
+    #
+    # Both architectures run on every build. Native arm64 runners are free for
+    # public repositories and no slower than amd64, so there is nothing to save
+    # by testing only one -- and since this job now gates promotion, testing one
+    # architecture would mean promoting `latest` for an architecture nobody
+    # checked.
+    #
+    # fail-fast is off so a single-architecture failure still reports the other
+    # one's result; either failure blocks promotion.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+            # Currently, ARM64 runners are version-pinned (there's no `ubuntu-latest` available)
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Render report.qmd inside the published image
+        env:
+          IMAGE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ needs.publish.outputs.digest }}
+        run: |
+          docker run --rm \
+            --platform linux/${{ matrix.arch }} \
+            --volume "$PWD:/project" \
+            --workdir /project \
+            "$IMAGE" \
+            bash .github/scripts/smoke-test.sh
+
+  # Only now, with both architectures proven to render, do the tags anyone
+  # actually pulls start pointing at this build. `imagetools create` copies the
+  # existing multi-arch index (attestations included) under new tags -- it is a
+  # registry-side manifest operation, so nothing is rebuilt or re-uploaded.
+  #
+  # Because this job is what moves `latest`, a smoke-test failure leaves users on
+  # the last image that passed. The trade-off is that `latest` lags a failing
+  # build rather than tracking HEAD, which is the point.
+  promote:
+    needs: [publish, smoke]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # The semver entries are no-ops unless the ref is a "vX.Y.Z" tag, and
+      # `latest` only applies on the default branch -- so a release run promotes
+      # the version tags and a push to main promotes `latest`.
+      - name: Work out which tags to promote
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/ketchbrookanalytics/quarto-pdf-dev
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Promote the tested image
+        env:
+          # Newline-separated, passed through the environment rather than
+          # interpolated into the script, so tag values can't break quoting.
+          TAGS: ${{ steps.meta.outputs.tags }}
+          SOURCE: ghcr.io/ketchbrookanalytics/quarto-pdf-dev@${{ needs.publish.outputs.digest }}
+        run: |
+          tags=()
+          while IFS= read -r tag; do
+            # An `if` rather than `[ -n "$tag" ] && ...`: the && form returns
+            # non-zero on the blank line, and these steps run under `bash -e`.
+            if [ -n "$tag" ]; then
+              tags+=("$tag")
+            fi
+          done <<< "$TAGS"
+
+          # Nothing to promote when neither rule matched -- e.g. a manual run on
+          # a non-default branch, which should stay reachable only by sha- tag.
+          if [ "${#tags[@]}" -eq 0 ]; then
+            echo "No promotion tags for this ref; leaving the sha- tag as the only reference."
+            exit 0
+          fi
+
+          args=()
+          for tag in "${tags[@]}"; do
+            args+=(--tag "$tag")
+          done
+
+          docker buildx imagetools create "${args[@]}" "$SOURCE"
+          echo "Promoted $SOURCE to:"
+          printf '  %s\n' "${tags[@]}"

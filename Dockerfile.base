@@ -4,8 +4,14 @@
 # the project-specific "prod" stage lives in the root Dockerfile and builds
 # FROM this image.
 
-# Define the version of R that we'll be using
-ARG R_VERSION=4.6.0
+# Define the version of R that we'll be using.
+#
+# Pinned to 4.5.x: R 4.6.0 breaks the vscode-R session watcher, so `View()` on a
+# {gt} table (or any HTML widget) fails with "unable to start data viewer" in the
+# devcontainer. See https://github.com/REditorSupport/vscode-R/issues/1696. A fix
+# exists in the vscode-R development release; once it ships to the marketplace,
+# this can move back to 4.6.x.
+ARG R_VERSION=4.5.2
 
 # Use the rocker/verse base image to install the specific version of R
 FROM rocker/r-ver:${R_VERSION} AS dev

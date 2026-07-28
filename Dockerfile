@@ -2,10 +2,11 @@
 # renv) is pre-built from Dockerfile.base and published to ghcr.io by
 # .github/workflows/publish-image.yml, so new repos no longer rebuild it.
 #
-# ":latest" always tracks the newest base. For a fully reproducible build,
-# pin this to an immutable digest tag (e.g. ":sha-abc1234"); the publish
-# workflow tags every build with its commit SHA. Do this at handoff, alongside
-# locking renv.lock (see the README's "Pre-Deployment Steps").
+# ":latest" always tracks the newest base, so an in-flight project picks up
+# OS/security patches from the weekly rebuild. For a fully reproducible build,
+# pin this to a released version tag (e.g. ":v0.2.0") at handoff, alongside
+# locking renv.lock. See the README's "Pre-Deployment Steps" and
+# "Versioning & Releases" sections.
 FROM ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest
 
 # Set the working directory for the project
