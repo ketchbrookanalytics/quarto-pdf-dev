@@ -10,7 +10,28 @@ every release note calls out the versions it ships.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- Permission allow rules in [.claude/settings.json](.claude/settings.json) so
+  Claude Code edits the authoring surface without a prompt per file: root
+  `*.qmd`, [qmd/](qmd/), [R/](R/), [_targets.R](_targets.R), [assets/](assets/),
+  [.devcontainer/](.devcontainer/), [CLAUDE.md](CLAUDE.md), and
+  [_quarto.yml](_quarto.yml). `Edit(...)` is the rule namespace for every
+  file-modifying tool, so `Write` and `NotebookEdit` are covered by the same
+  entries. Everything outside the list — `Dockerfile`, `.github/`, `.gitignore`,
+  and `.claude/settings.json` itself — still prompts.
+- Allow rules for `quarto render` / `quarto preview` and read-only `git`
+  (`status`, `diff`, `log`, `show`), so an iterate-and-render loop does not stop
+  on a prompt each pass. Only rules that hold for anyone using this template
+  belong here; organization-specific rules (a `gh api` allowance scoped to your
+  own GitHub org, for instance) belong in the downstream project repository, not
+  in the template.
+
+### Changed
+
+- `.Renviron` and `data/**` are now denied for editing as well as reading. The
+  previous rules blocked reads only, which left a git-ignored secrets file
+  overwritable.
 
 ## [0.2.0] - 2026-07-28
 
