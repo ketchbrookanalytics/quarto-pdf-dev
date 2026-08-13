@@ -53,6 +53,22 @@ The devcontainer also offers the following additional features:
 - Use of [Air](https://posit-dev.github.io/air/) for R code formatting.
 - [Claude Code](https://code.claude.com/docs/en/vs-code) VSCode extension for AI-assisted development.
 
+### Recommended Claude Code Plugins
+
+Reports written from this template are read by clients, auditors, and examiners, so the prose matters as much as the numbers. We recommend installing [SimpleEnglish](https://github.com/AminBlg/SimpleEnglish), a plugin that applies [ASD-STE100 Simplified Technical English](https://www.asd-ste100.org/): short sentences, one word with one meaning, active voice, and the condition stated before the instruction.
+
+Install it once per machine from a Claude Code session:
+
+```
+/plugin marketplace add AminBlg/SimpleEnglish
+/plugin install simple-english@simple-english
+```
+
+Then ask Claude to apply it when drafting or revising narrative sections.
+
+> [!NOTE]
+> Plugins install per machine, not per repository, so each person working on a report installs this themselves. It is deliberately not baked into the [devcontainer](.devcontainer/) — the image pins a *dependency stack* that has to render identically years from now, and a writing-style plugin that updates on its own doesn't belong in that guarantee.
+
 ## Deployment
 
 ### Pre-Deployment Steps
