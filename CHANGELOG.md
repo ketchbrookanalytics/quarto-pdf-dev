@@ -10,6 +10,11 @@ every release note calls out the versions it ships.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-14
+
+Dependency stack: **R 4.5.2**, **Quarto 1.9.38**, **`{renv}` 1.2.3** (unchanged
+from 0.2.0)
+
 ### Added
 
 - Permission allow rules in [.claude/settings.json](.claude/settings.json) so
@@ -26,6 +31,15 @@ every release note calls out the versions it ships.
   belong here; organization-specific rules (a `gh api` allowance scoped to your
   own GitHub org, for instance) belong in the downstream project repository, not
   in the template.
+- A **Recommended Claude Code Plugins** section in the
+  [README](README.md#recommended-claude-code-plugins) covering
+  [SimpleEnglish](https://github.com/AminBlg/SimpleEnglish), which applies
+  [ASD-STE100 Simplified Technical English](https://www.asd-ste100.org/) to the
+  narrative sections of a report. Documented rather than vendored, since upstream
+  ships its own marketplace manifest, and deliberately left out of the
+  devcontainer: plugins install per machine rather than per repository, and a
+  writing-style plugin that updates on its own does not belong inside an image
+  whose job is to render identically years from now.
 
 ### Changed
 
@@ -107,6 +121,7 @@ Dependency stack: **R 4.5.2**, **Quarto 1.9.38**, **`{renv}` 1.2.3**
 
 Initial release.
 
-[Unreleased]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/releases/tag/v0.1.0
