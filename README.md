@@ -88,8 +88,18 @@ renv::install("yaml")
 # Discover project R package dependencies
 deps <- unique(renv::dependencies()$Package)
 
+# Disable the {pak} engine temporarily so that recommended packages (such as
+# {lattice}) don't get upgraded; `renv::install()` with the {pak} engine enabled
+# forces upgrades, and {pak} cannot install a recommended package from P3M --
+# see the note below
+Sys.setenv(RENV_CONFIG_PAK_ENABLED = "FALSE")
+
 # Install R package dependencies for the project
 renv::install(deps[deps != "renv"])   # Select "Y" or "Yes"
+
+# Re-enable the {pak} engine, so the rest of the session matches the
+# devcontainer default. `renv::snapshot()` below does not use {pak} either way
+Sys.setenv(RENV_CONFIG_PAK_ENABLED = "TRUE")
 
 # Create the renv.lock lockfile
 # Note: if prompted to first install additional required packages, follow the
@@ -97,6 +107,9 @@ renv::install(deps[deps != "renv"])   # Select "Y" or "Yes"
 renv::snapshot()
 
 ```
+
+> [!NOTE]
+> `renv::install()` runs `{pak}` with `upgrade = TRUE`, which tries to pull every dependency up to the newest version P3M offers. That breaks on *recommended* packages: `R_VERSION` is pinned in [Dockerfile.base](Dockerfile.base) while the weekly base rebuild keeps advancing the P3M snapshot, so P3M indexes recommended packages under a `src/contrib/<newer R version>/Recommended` subdirectory that its binary redirect does not cover. `{pak}` requests that URL, receives a source tarball, and aborts with `is not a valid binary, it is missing <pkg>/Meta/package.rds`. With the `{pak}` engine off, `{renv}`'s own installer leaves the R-bundled copies alone, and the lock file records them at the versions the base image already ships. See [#26](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/26).
 
 The resulting `renv.lock` file will be used by Docker during build time to install the exact R package dependencies used in the project via `renv::restore()`.
 
