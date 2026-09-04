@@ -20,18 +20,10 @@ COPY _targets.R     _targets.R
 COPY R/              R/
 COPY references.bib references.bib
 COPY renv.lock      renv.lock
-COPY report.qmd     report.qmd
-
-# {renv}'s activation script and the `.Rprofile` that sources it. Without these
-# the project library is never placed on `.libPaths()`, so `renv::restore()`
-# below would populate a library that `quarto render` cannot see - and
-# {pak}-backed restore, which installs into `.libPaths()[1]`, would write to the
-# system site-library instead of the project library. These paths exist only
-# after `renv::init()`, the same precondition `COPY renv.lock` above already
-# carries.
 COPY .Rprofile          .Rprofile
 COPY renv/activate.R    renv/activate.R
 COPY renv/settings.json renv/settings.json
+COPY report.qmd     report.qmd
 
 # Install the R packages in the lock file
 # This should use {pak} and install system packages, too
