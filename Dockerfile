@@ -20,6 +20,9 @@ COPY _targets.R     _targets.R
 COPY R/              R/
 COPY references.bib references.bib
 COPY renv.lock      renv.lock
+COPY .Rprofile          .Rprofile
+COPY renv/activate.R    renv/activate.R
+COPY renv/settings.json renv/settings.json
 COPY report.qmd     report.qmd
 
 # Install the R packages in the lock file

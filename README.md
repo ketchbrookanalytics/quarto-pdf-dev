@@ -88,6 +88,13 @@ renv::install("yaml")
 # Discover project R package dependencies
 deps <- unique(renv::dependencies()$Package)
 
+# Disable the {pak} engine temporarily so that recommended packages (such as
+# {lattice}) don't get upgraded; `renv::install()` with the {pak} engine enabled
+# forces upgrades, and {pak} cannot install a recommended package from P3M.
+# See [#26](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/26) for
+# additional context.
+Sys.setenv(RENV_CONFIG_PAK_ENABLED = "FALSE")
+
 # Install R package dependencies for the project
 renv::install(deps[deps != "renv"])   # Select "Y" or "Yes"
 
@@ -95,7 +102,6 @@ renv::install(deps[deps != "renv"])   # Select "Y" or "Yes"
 # Note: if prompted to first install additional required packages, follow the
 # directions to do so via `renv::install()` prior to re-running renv::snapshot()
 renv::snapshot()
-
 ```
 
 The resulting `renv.lock` file will be used by Docker during build time to install the exact R package dependencies used in the project via `renv::restore()`.

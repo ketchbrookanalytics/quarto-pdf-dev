@@ -72,6 +72,6 @@ ARG RENV_VERSION=1.2.3
 
 # Install {renv}
 # Note that we won't use {renv} to install packages during development;
-# conversely, we'll use {pak}. We'll only use {renv} during the pre-deployment
+# instead, we'll use {pak}. We'll only use {renv} during the pre-deployment
 # process (see README for further instructions).
 RUN R -q -e "pak::pkg_install('rstudio/renv@v${RENV_VERSION}')"

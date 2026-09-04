@@ -5,10 +5,27 @@ All notable changes to this template are recorded here. The format follows
 adheres to the versioning policy documented in the
 [README](README.md#versioning--releases).
 
-Because the pinned dependency stack (R, Quarto, `{renv}`) *is* the product here,
-every release note calls out the versions it ships.
+Because the pinned dependency stack (R, Quarto, `{renv}`) *is* the product
+here, every release note calls out the versions it ships.
 
 ## [Unreleased]
+
+### Fixed
+
+- The pre-deployment `renv::install(deps[deps != "renv"])` step no longer aborts
+  on recommended packages. See
+  [#26](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/26) for a
+  full discussion of the issue, and
+  [#27](https://github.com/ketchbrookanalytics/quarto-pdf-dev/pull/27) for the
+  fix.
+- The deployment [Dockerfile](Dockerfile) now copies `.Rprofile`,
+  `renv/activate.R`, and `renv/settings.json`. Without these, nothing placed
+  the project library on `.libPaths()`, and `renv::restore()` (with the {pak}
+  engine; i.e., `renv:::renv_pak_restore()`) didn't pass any `lib` to `{pak}`,
+  so `renv::restore()` installed into `/usr/local/lib/R/site-library` and never
+  created a project library at all. That failed silently; the build went
+  green and the report rendered, but from a library `renv.lock` did *not*
+  govern, which defeated the point of pinning the lock file at handoff.
 
 ## [0.2.1] - 2026-08-14
 
