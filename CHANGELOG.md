@@ -10,6 +10,20 @@ here, every release note calls out the versions it ships.
 
 ## [Unreleased]
 
+### Changed
+
+- Quarto bumped from **1.9.38** to **1.10.19**.
+
+### Fixed
+
+- The weekly `linux/arm64` base-image build no longer fails with an HTTP 404
+  on `quarto install chrome-headless-shell`. Playwright moved its Chrome for
+  Testing downloads in September 2026, and Quarto 1.9.38 still built the old
+  URL. Quarto 1.10.19 includes the upstream fix
+  ([quarto-dev/quarto-cli#14860](https://github.com/quarto-dev/quarto-cli/pull/14860),
+  backported in #14861). Closes
+  [#29](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/29).
+
 ## [0.2.2] - 2026-09-04
 
 Dependency stack: **R 4.5.2**, **Quarto 1.9.38**, **`{renv}` 1.2.3** (unchanged
