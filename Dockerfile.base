@@ -17,7 +17,7 @@ ARG R_VERSION=4.5.2
 FROM rocker/r-ver:${R_VERSION} AS dev
 
 # Define the versions of the other software dependencies we'll be using
-ARG QUARTO_VERSION=1.9.38
+ARG QUARTO_VERSION=1.10.19
 
 # Install fonts, along with the shared libraries that Chrome Headless Shell
 # (installed below) needs at runtime to render mermaid/graphviz diagrams.
