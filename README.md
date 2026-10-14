@@ -31,6 +31,7 @@ Start R with the "R: Create R Terminal" command from the VS Code Command Palette
 A terminal that you open with the "+" button is not connected. In that terminal, `View()` fails with this error:
 
 ```
+> View(head(iris))
 Error in .External2(C_dataviewer, x, title) : unable to start data viewer
 In addition: Warning message:
 In View(head(iris)) : unable to open display
