@@ -35,6 +35,9 @@ from 4.5.2 in 0.3.0)
   default terminal profile is now "R Terminal", the profile that the R extension
   adds, instead of a custom `arf` profile that started arf without a
   connection.
+- Publishing a GitHub Release no longer moves the `latest` image tag. Only
+  builds of `main` move it, as the README already said
+  ([#32](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/32)).
 
 ### Removed
 
