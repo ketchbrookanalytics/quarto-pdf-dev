@@ -24,6 +24,22 @@ If you don't see the popup, you can also reopen in container via the VSCode Comm
 
 This will pull the pre-built base image from `ghcr.io/ketchbrookanalytics/quarto-pdf-dev` (which will take a minute the first time you do this) and then spin up a Docker container that will serve as your development environment in VSCode. You can continue working in VSCode as you normally would! If you make changes to any of the files in the [.devcontainer/](.devcontainer/) directory, you will need to rebuild the container.
 
+### Starting an R Session
+
+Start R with the "R: Create R Terminal" command from the VS Code Command Palette. This command opens an arf terminal that is connected to the R extension. The connection lets `View()`, the plot viewer, and the workspace viewer work.
+
+A terminal that you open with the "+" button is not connected. In that terminal, `View()` fails with this error:
+
+```
+Error in .External2(C_dataviewer, x, title) : unable to start data viewer
+In addition: Warning message:
+In View(head(iris)) : unable to open display
+```
+
+To connect that terminal, run "R: Attach External R Session (Copy command)" from the Command Palette. Then paste the copied `sess::connect()` command into the R console.
+
+The connection uses the [sess](https://github.com/REditorSupport/vscode-R/tree/main/sess) R package. [devcontainer.json](.devcontainer/devcontainer.json) installs `sess` from the version tag that matches the R extension. If VS Code updates the R extension, set the `sess` tag to the new version. Then rebuild the container.
+
 ### Why Devcontainers?
 
 Devcontainers in VSCode allow you to work inside of a Docker container. For us, there are two main advantages to this approach:

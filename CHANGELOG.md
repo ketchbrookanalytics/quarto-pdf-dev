@@ -10,6 +10,34 @@ here, every release note calls out the versions it ships.
 
 ## [Unreleased]
 
+Dependency stack: **R 4.6.1**, **Quarto 1.10.19**, **`{renv}` 1.2.3** (R up
+from 4.5.2 in 0.3.0)
+
+### Changed
+
+- R moved from **4.5.2** to **4.6.1**. This is a minor-version jump, so it is a
+  major release. The 4.5.2 pin from
+  [#20](https://github.com/ketchbrookanalytics/quarto-pdf-dev/issues/20)
+  worked around a vscode-R bug with R 4.6
+  ([REditorSupport/vscode-R#1696](https://github.com/REditorSupport/vscode-R/issues/1696)).
+  vscode-R 3.0.0 fixed that bug.
+
+### Fixed
+
+- `View()`, the plot viewer, and the workspace viewer work again in the
+  devcontainer. vscode-R 3.0.0 (2026-09-27) stopped writing
+  `~/.vscode-R/init.R` and connects to R through the new `{sess}` R package.
+  When `init.R` was missing, `.Rprofile` skipped it without a message, and
+  `View()` failed with "unable to open display". The
+  devcontainer now installs `{sess}` from the tag that matches the extension
+  (`v3.0.1`). The README explains how to start a connected R terminal.
+
+### Removed
+
+- `.Rprofile`. Its only job was to source `~/.vscode-R/init.R`. At handoff,
+  `renv::init()` writes a new `.Rprofile`, so the deployment
+  [Dockerfile](Dockerfile) still finds one.
+
 ## [0.3.0] - 2026-10-12
 
 Dependency stack: **R 4.5.2**, **Quarto 1.10.19**, **`{renv}` 1.2.3** (Quarto

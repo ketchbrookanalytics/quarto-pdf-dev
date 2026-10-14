@@ -18,6 +18,9 @@
 		"gt",
 		"httpgd",
 		"languageserver",
+		// Connects R terminals to the R extension (for `View()`, plots, and
+		// the workspace viewer). Keep the tag equal to the R extension version.
+		"REditorSupport/vscode-R/sess@v3.0.1",
 		"targets",
 		"tibble"
 	],
