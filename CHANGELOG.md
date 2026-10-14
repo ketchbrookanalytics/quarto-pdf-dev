@@ -10,6 +10,8 @@ here, every release note calls out the versions it ships.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-13
+
 Dependency stack: **R 4.6.1**, **Quarto 1.10.19**, **`{renv}` 1.2.3** (R up
 from 4.5.2 in 0.3.0)
 
@@ -197,7 +199,8 @@ Dependency stack: **R 4.5.2**, **Quarto 1.9.38**, **`{renv}` 1.2.3**
 
 Initial release.
 
-[Unreleased]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/ketchbrookanalytics/quarto-pdf-dev/compare/v0.2.0...v0.2.1
