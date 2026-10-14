@@ -31,6 +31,10 @@ from 4.5.2 in 0.3.0)
   `View()` failed with "unable to open display". The
   devcontainer now installs `{sess}` from the tag that matches the extension
   (`v3.0.1`). The README explains how to start a connected R terminal.
+- The "+" button in the terminal panel now opens a connected arf terminal. The
+  default terminal profile is now "R Terminal", the profile that the R extension
+  adds, instead of a custom `arf` profile that started arf without a
+  connection.
 
 ### Removed
 

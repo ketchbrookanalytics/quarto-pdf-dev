@@ -26,9 +26,11 @@ This will pull the pre-built base image from `ghcr.io/ketchbrookanalytics/quarto
 
 ### Starting an R Session
 
-Start R with the "R: Create R Terminal" command from the VS Code Command Palette. This command opens an arf terminal that is connected to the R extension. The connection lets `View()`, the plot viewer, and the workspace viewer work.
+Open a terminal with the "+" button in the VS Code terminal panel. The terminal starts arf and connects it to the R extension. The connection lets `View()`, the plot viewer, and the workspace viewer work. When the terminal connects, it shows `[sess] Connected to VS Code`. The "R: Create R Terminal" command from the Command Palette opens the same connected terminal.
 
-A terminal that you open with the "+" button is not connected. In that terminal, `View()` fails with this error:
+To get a bash terminal (for example, to run `quarto render`), click the arrow next to the "+" button and select "bash".
+
+An R session that is not connected cannot open `View()`. For example, R that you start yourself from a bash terminal is not connected. In that session, `View()` fails with this error:
 
 ```
 > View(head(iris))
@@ -37,7 +39,7 @@ In addition: Warning message:
 In View(head(iris)) : unable to open display
 ```
 
-To connect that terminal, run "R: Attach External R Session (Copy command)" from the Command Palette. Then paste the copied `sess::connect()` command into the R console.
+To connect that session, run "R: Attach External R Session (Copy command)" from the Command Palette. Then paste the copied `sess::connect()` command into the R console.
 
 The connection uses the [sess](https://github.com/REditorSupport/vscode-R/tree/main/sess) R package. [devcontainer.json](.devcontainer/devcontainer.json) installs `sess` from the version tag that matches the R extension. If VS Code updates the R extension, set the `sess` tag to the new version. Then rebuild the container.
 
