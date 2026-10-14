@@ -18,6 +18,9 @@
 		"gt",
 		"httpgd",
 		"languageserver",
+		// Connects R terminals to the R extension (for `View()`, plots, and
+		// the workspace viewer). Keep the tag equal to the R extension version.
+		"REditorSupport/vscode-R/sess@v3.0.1",
 		"targets",
 		"tibble"
 	],
@@ -34,13 +37,11 @@
 	    		"r.plot.useHttpgd": true,
 	    		"r.rterm.linux": "/root/.cargo/bin/arf",
 	    		"r.sessionWatcher": true,
-        		"terminal.integrated.defaultProfile.linux": "arf",
-				"terminal.integrated.profiles.linux": {
-        		  "arf": {
-        		    "path": "/root/.cargo/bin/arf",
-        		    "icon": "terminal"
-        		  }
-        		},
+				// "R Terminal" is the profile that the R extension adds. It starts
+				// `r.rterm.linux` (arf) connected to the extension, the same as
+				// "R: Create R Terminal", so the "+" button opens a connected R
+				// terminal too.
+        		"terminal.integrated.defaultProfile.linux": "R Terminal",
 	    		"[r]": {
     			    "editor.formatOnSave": true,
     			    "editor.defaultFormatter": "Posit.air-vscode"

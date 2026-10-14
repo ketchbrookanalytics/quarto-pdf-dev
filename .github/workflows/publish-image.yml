@@ -192,11 +192,18 @@ jobs:
       # The semver entries are no-ops unless the ref is a "vX.Y.Z" tag, and
       # `latest` only applies on the default branch -- so a release run promotes
       # the version tags and a push to main promotes `latest`.
+      #
+      # `flavor: latest=false` keeps it that way. The action's default,
+      # `latest=auto`, adds `latest` to every run that makes a semver tag, so
+      # without it a release run also moves `latest` -- off the newest `main`
+      # build, or even back to an older line for a patch release such as
+      # v0.2.3 after v0.3.0. See #32.
       - name: Work out which tags to promote
         id: meta
         uses: docker/metadata-action@v6
         with:
           images: ghcr.io/ketchbrookanalytics/quarto-pdf-dev
+          flavor: latest=false
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern=v{{version}}
