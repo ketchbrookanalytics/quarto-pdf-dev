@@ -6,10 +6,16 @@
 	// Requires the ghcr.io package to be public (or `docker login ghcr.io`).
 	"image": "ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest",
 
+	// Install system dependencies and the Air CLI. VS Code waits for this step
+	// before activating extensions, so the Air extension finds `air` on PATH.
+	// It always finishes before `postCreateCommand` starts, so their apt-get
+	// calls can't overlap.
+	"onCreateCommand": ["bash", ".devcontainer/onCreate.sh"],
+
 	// Install the `arf` R terminal and R packages for developing in VScode.
 	// Run as a single sequential script (rather than the object form, whose
-	// entries run in parallel) so arf's apt-get calls can't race pak's own
-	// apt-get sysreqs installation and deadlock on the dpkg lock.
+	// entries run in parallel) so arf's install can't race pak's apt-get
+	// sysreqs installation.
 	"postCreateCommand": [
 		"bash",
 		".devcontainer/postCreate.sh",
@@ -42,7 +48,7 @@
 				// "R: Create R Terminal", so the "+" button opens a connected R
 				// terminal too.
         		"terminal.integrated.defaultProfile.linux": "R Terminal",
-				// Use the Air CLI that postCreate.sh installs on PATH instead of
+				// Use the Air CLI that onCreate.sh installs on PATH instead of
 				// the extension's bundled copy, so the editor formats R code with
 				// the same version as the terminal and Claude Code's hook.
 				"air.executableStrategy": "environment",
