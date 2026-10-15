@@ -12,6 +12,7 @@
       "Edit(./_quarto.yml)",
       "Bash(quarto render:*)",
       "Bash(quarto preview:*)",
+      "Bash(air format:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -22,6 +23,19 @@
       "Read(./data/**)",
       "Edit(./.Renviron)",
       "Edit(./data/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/air-format.sh\""
+          }
+        ]
+      }
     ]
   }
 }

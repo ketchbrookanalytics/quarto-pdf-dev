@@ -69,8 +69,8 @@ As you develop, you'll likely have the need to install additional R packages. In
 The devcontainer also offers the following additional features:
 
 - The [arf](https://github.com/eitsupi/arf) R terminal for a friendly R console experience that includes auto-complete and syntax highlighting.
-- Use of [Air](https://posit-dev.github.io/air/) for R code formatting.
-- [Claude Code](https://code.claude.com/docs/en/vs-code) VSCode extension for AI-assisted development.
+- Use of [Air](https://posit-dev.github.io/air/) for R code formatting. The Air CLI is on `PATH`, so you can run `air format .` from any terminal. The Air VS Code extension uses the same CLI. [postCreate.sh](.devcontainer/postCreate.sh) installs the latest Air release, so rebuild the container to update it.
+- [Claude Code](https://code.claude.com/docs/en/vs-code) VSCode extension for AI-assisted development. A hook in [.claude/settings.json](.claude/settings.json) formats each `.R` file with Air after Claude edits it.
 
 ### Recommended Claude Code Plugins
 
