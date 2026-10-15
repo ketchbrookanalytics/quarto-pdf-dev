@@ -13,9 +13,9 @@ here, every release note calls out the versions it ships.
 ### Added
 
 - The devcontainer now installs the [Air](https://posit-dev.github.io/air/)
-  CLI (**0.12.0**) on `PATH`, so `air format` works in any terminal and Claude
-  Code can run it. The Air VS Code extension now uses this same binary instead
-  of its bundled copy, so every tool formats with one pinned version.
+  CLI on `PATH`, so `air format` works in any terminal and Claude Code can run
+  it. The Air VS Code extension now uses this same binary instead of its
+  bundled copy, so every tool in the container formats with one version.
 - A Claude Code hook formats each `.R` file with Air after Claude edits it.
   Claude Code writes files directly, so VS Code's format-on-save never ran on
   its edits.
