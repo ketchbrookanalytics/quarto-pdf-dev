@@ -42,6 +42,10 @@
 				// "R: Create R Terminal", so the "+" button opens a connected R
 				// terminal too.
         		"terminal.integrated.defaultProfile.linux": "R Terminal",
+				// Use the Air CLI that postCreate.sh installs on PATH instead of
+				// the extension's bundled copy, so the editor formats R code with
+				// the same pinned version as the terminal and Claude Code's hook.
+				"air.executableStrategy": "environment",
 	    		"[r]": {
     			    "editor.formatOnSave": true,
     			    "editor.defaultFormatter": "Posit.air-vscode"
