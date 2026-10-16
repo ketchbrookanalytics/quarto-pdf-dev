@@ -1,7 +1,2 @@
-# Auto detect text files and perform LF normalization
-* text=auto
-
-# Force LF regardless of platform/core.autocrlf. These scripts are bind-mounted
-# into a Linux container (the dev container, and the CI smoke test) and must
-# never be checked out with CRLF endings.
-*.sh text eol=lf
+# Auto detect text files and perform LF normalization on every OS
+* text=auto eol=lf
