@@ -6,6 +6,33 @@
 	// Requires the ghcr.io package to be public (or `docker login ghcr.io`).
 	"image": "ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest",
 
+	// Install the GitHub CLI, so `gh` is available for issues and pull
+	// requests from inside the container.
+	"features": {
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+
+	// Keep the GitHub CLI and Claude Code credentials in named Docker volumes
+	// rather than in bind mounts to the host. Docker creates a named volume on
+	// first use, so this needs no host-side setup step and behaves the same on
+	// a Windows, macOS, or Linux host. The volumes outlive "Rebuild Container",
+	// so you sign in once rather than once per rebuild. The names are fixed
+	// rather than per-project, so every report built from this template shares
+	// one login; append `-${devcontainerId}` to either name to isolate a
+	// project instead.
+	"mounts": [
+		"source=quarto-pdf-dev-gh,target=/root/.config/gh,type=volume",
+		"source=quarto-pdf-dev-claude,target=/root/.claude,type=volume"
+	],
+
+	// Claude Code keeps its token in ~/.claude/.credentials.json but its
+	// account and onboarding state in ~/.claude.json, which is outside the
+	// volume above. Pointing its config directory at the volume keeps both, so
+	// a rebuild doesn't send you back through sign-in.
+	"containerEnv": {
+		"CLAUDE_CONFIG_DIR": "/root/.claude"
+	},
+
 	// Install system dependencies and the Air CLI. VS Code waits for this step
 	// before activating extensions, so the Air extension finds `air` on PATH.
 	// It always finishes before `postCreateCommand` starts, so their apt-get
@@ -25,7 +52,8 @@
 		"httpgd",
 		"languageserver",
 		// Connects R terminals to the R extension (for `View()`, plots, and
-		// the workspace viewer). Keep the tag equal to the R extension version.
+		// the workspace viewer). Keep the tag equal to the pinned R extension
+		// version below, or the extension prompts to install its own copy.
 		"REditorSupport/vscode-R/sess@v3.0.1",
 		"targets",
 		"tibble"
@@ -72,7 +100,11 @@
 				"Posit.air-vscode",
 				"quarto.quarto",
 				"RDebugger.r-debugger",
-				"REditorSupport.r"
+				// Pinned so it can't drift from the `sess` tag above. Before
+				// moving past 3.0.1: from 3.2.0 the extension matches `sess` by
+				// a Git tree ID that sess/bootstrap.R stamps at build time, and
+				// pak's GitHub tarball install has no .git to stamp it from.
+				"REditorSupport.r@3.0.1"
 			]
 		}
 	},

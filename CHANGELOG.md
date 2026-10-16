@@ -19,6 +19,28 @@ here, every release note calls out the versions it ships.
 - A Claude Code hook formats each `.R` file with Air after Claude edits it.
   Claude Code writes files directly, so VS Code's format-on-save never ran on
   its edits.
+- The [GitHub CLI](https://cli.github.com/) is now installed in the
+  devcontainer, for working with issues and pull requests from inside the
+  container.
+- GitHub CLI and Claude Code credentials now persist in named Docker volumes
+  (`quarto-pdf-dev-gh` and `quarto-pdf-dev-claude`), so "Rebuild Container" no
+  longer signs you out. These are named volumes rather than bind mounts to the
+  host: Docker creates a named volume on first use, so there is no host-side
+  setup step to get wrong, and no split between `${localEnv:USERPROFILE}` on
+  Windows and `${localEnv:HOME}` elsewhere. One login is shared by every report
+  built from this template; appending `-${devcontainerId}` to a volume name
+  gives a single project its own.
+- A README section on signing in to GitHub and Claude Code, which also covers
+  the one case where the Dev Containers extension's own git credential
+  forwarding breaks. Running `gh auth login` on the *host* writes a helper into
+  the global `.gitconfig` that names the host's `gh` binary by path
+  (`C:\Program Files\GitHub CLI\gh.exe` on Windows, a Homebrew path on macOS).
+  That file is copied into the container, where it clears the forwarded helper
+  and replaces it with a path that does not exist on Linux, so `git push` asks
+  for credentials it can never get. The fix is documented as an opt-in
+  `remoteEnv` block rather than shipped switched on, because it would replace
+  working forwarded credentials for everyone who has never run `gh` on their
+  host.
 
 ## [1.0.0] - 2026-10-13
 
