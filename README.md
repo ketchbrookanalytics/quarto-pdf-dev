@@ -71,6 +71,52 @@ The devcontainer also offers the following additional features:
 - The [arf](https://github.com/eitsupi/arf) R terminal for a friendly R console experience that includes auto-complete and syntax highlighting.
 - Use of [Air](https://posit-dev.github.io/air/) for R code formatting. The Air CLI is on `PATH`, so you can run `air format .` from any terminal. The Air VS Code extension uses the same CLI. [onCreate.sh](.devcontainer/onCreate.sh) installs the latest Air release, so rebuild the container to update it.
 - [Claude Code](https://code.claude.com/docs/en/vs-code) VSCode extension for AI-assisted development. A hook in [.claude/settings.json](.claude/settings.json) formats each `.R` file with Air after Claude edits it.
+- The [GitHub CLI](https://cli.github.com/) for working with issues and pull requests from inside the container. See [Signing In to GitHub and Claude Code](#signing-in-to-github-and-claude-code) below.
+
+### Signing In to GitHub and Claude Code
+
+The devcontainer keeps your GitHub CLI and Claude Code credentials in two named Docker volumes, `quarto-pdf-dev-gh` and `quarto-pdf-dev-claude`, rather than reading them from the host machine. Sign in once, from a terminal inside the container:
+
+```bash
+gh auth login
+```
+
+Those volumes outlive "Rebuild Container", so a rebuild does not sign you out, and they are shared by every report built from this template, so you sign in once per machine rather than once per project. To give one project its own separate login, append `-${devcontainerId}` to the volume names in [devcontainer.json](.devcontainer/devcontainer.json).
+
+> [!NOTE]
+> The volumes belong to Docker, not to this repository, so deleting the container or the repository leaves them in place. Run `docker volume rm quarto-pdf-dev-gh quarto-pdf-dev-claude` to sign out of both.
+
+Signing in to `gh` is not required for `git push`. The Dev Containers extension forwards your host git credentials into the container on its own, so pushing generally works without any of this.
+
+#### If `git push` asks for credentials it cannot get
+
+There is one case where that forwarding breaks, and it is worth knowing because the symptom is confusing. If you have run `gh auth login` **on your host machine**, `gh` wrote a credential helper into your global `.gitconfig` that points at the `gh` binary by its host path:
+
+```ini
+[credential "https://github.com"]
+	helper =
+	helper = !'C:\\Program Files\\GitHub CLI\\gh.exe' auth git-credential
+```
+
+The extension copies that `.gitconfig` into the container, where the empty `helper =` line clears the forwarded helper and the path that replaces it does not exist on Linux. Git is then left with a helper it cannot run.
+
+To fix it, point git at the container's own `gh` for this container only, by adding the following to [devcontainer.json](.devcontainer/devcontainer.json) and rebuilding. Sign in with `gh auth login` inside the container afterwards:
+
+```jsonc
+"remoteEnv": {
+	"GIT_CONFIG_COUNT": "4",
+	"GIT_CONFIG_KEY_0": "credential.https://github.com.helper",
+	"GIT_CONFIG_VALUE_0": "",
+	"GIT_CONFIG_KEY_1": "credential.https://github.com.helper",
+	"GIT_CONFIG_VALUE_1": "!/usr/bin/gh auth git-credential",
+	"GIT_CONFIG_KEY_2": "credential.https://gist.github.com.helper",
+	"GIT_CONFIG_VALUE_2": "",
+	"GIT_CONFIG_KEY_3": "credential.https://gist.github.com.helper",
+	"GIT_CONFIG_VALUE_3": "!/usr/bin/gh auth git-credential"
+},
+```
+
+This is deliberately not switched on by default. It replaces the forwarded credentials for everyone, including the majority who never ran `gh` on their host and whose pushes already work.
 
 ### Recommended Claude Code Plugins
 

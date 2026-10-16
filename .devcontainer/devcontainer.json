@@ -6,6 +6,25 @@
 	// Requires the ghcr.io package to be public (or `docker login ghcr.io`).
 	"image": "ghcr.io/ketchbrookanalytics/quarto-pdf-dev:latest",
 
+	// Install the GitHub CLI, so `gh` is available for issues and pull
+	// requests from inside the container.
+	"features": {
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+
+	// Keep the GitHub CLI and Claude Code credentials in named Docker volumes
+	// rather than in bind mounts to the host. Docker creates a named volume on
+	// first use, so this needs no host-side setup step and behaves the same on
+	// a Windows, macOS, or Linux host. The volumes outlive "Rebuild Container",
+	// so you sign in once rather than once per rebuild. The names are fixed
+	// rather than per-project, so every report built from this template shares
+	// one login; append `-${devcontainerId}` to either name to isolate a
+	// project instead.
+	"mounts": [
+		"source=quarto-pdf-dev-gh,target=/root/.config/gh,type=volume",
+		"source=quarto-pdf-dev-claude,target=/root/.claude,type=volume"
+	],
+
 	// Install system dependencies and the Air CLI. VS Code waits for this step
 	// before activating extensions, so the Air extension finds `air` on PATH.
 	// It always finishes before `postCreateCommand` starts, so their apt-get
