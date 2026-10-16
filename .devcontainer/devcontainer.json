@@ -44,7 +44,8 @@
 		"httpgd",
 		"languageserver",
 		// Connects R terminals to the R extension (for `View()`, plots, and
-		// the workspace viewer). Keep the tag equal to the R extension version.
+		// the workspace viewer). Keep the tag equal to the pinned R extension
+		// version below, or the extension prompts to install its own copy.
 		"REditorSupport/vscode-R/sess@v3.0.1",
 		"targets",
 		"tibble"
@@ -91,7 +92,11 @@
 				"Posit.air-vscode",
 				"quarto.quarto",
 				"RDebugger.r-debugger",
-				"REditorSupport.r"
+				// Pinned so it can't drift from the `sess` tag above. Before
+				// moving past 3.0.1: from 3.2.0 the extension matches `sess` by
+				// a Git tree ID that sess/bootstrap.R stamps at build time, and
+				// pak's GitHub tarball install has no .git to stamp it from.
+				"REditorSupport.r@3.0.1"
 			]
 		}
 	},
