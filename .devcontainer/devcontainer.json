@@ -58,7 +58,11 @@
     			},
     			"[quarto]": {
     			    "editor.formatOnSave": true,
-    			    "editor.defaultFormatter": "quarto.quarto"
+    			    "editor.defaultFormatter": "quarto.quarto",
+    			    "editor.wordWrap": "on"
+    			},
+    			"[markdown]": {
+    			    "editor.wordWrap": "on"
     			}
 			},
 			// We also recommend installing the `tomoki1207.pdf` extension,
