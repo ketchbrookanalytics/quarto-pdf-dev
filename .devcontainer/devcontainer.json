@@ -25,6 +25,14 @@
 		"source=quarto-pdf-dev-claude,target=/root/.claude,type=volume"
 	],
 
+	// Claude Code keeps its token in ~/.claude/.credentials.json but its
+	// account and onboarding state in ~/.claude.json, which is outside the
+	// volume above. Pointing its config directory at the volume keeps both, so
+	// a rebuild doesn't send you back through sign-in.
+	"containerEnv": {
+		"CLAUDE_CONFIG_DIR": "/root/.claude"
+	},
+
 	// Install system dependencies and the Air CLI. VS Code waits for this step
 	// before activating extensions, so the Air extension finds `air` on PATH.
 	// It always finishes before `postCreateCommand` starts, so their apt-get
