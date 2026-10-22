@@ -42,6 +42,12 @@ here, every release note calls out the versions it ships.
   working forwarded credentials for everyone who has never run `gh` on their
   host.
 
+### Removed
+
+- The devcontainer no longer sets `files.useExperimentalFileWatcher`. VS Code
+  removed that setting years ago, so it was ignored and did not make Claude
+  Code's edits show up live in open editors.
+
 ### Fixed
 
 - Saving a `.qmd` file no longer stalls for several seconds. Format-on-save
