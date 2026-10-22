@@ -65,7 +65,6 @@
 		"vscode": {
 			"settings": {
 				"editor.rulers": [80],
-				"files.useExperimentalFileWatcher": true,
 	    		"r.bracketedPaste": true,
 				"r.lsp.promptToInstall": false,
 	    		"r.plot.useHttpgd": true,
