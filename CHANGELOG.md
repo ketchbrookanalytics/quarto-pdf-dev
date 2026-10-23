@@ -42,6 +42,21 @@ here, every release note calls out the versions it ships.
   working forwarded credentials for everyone who has never run `gh` on their
   host.
 
+### Removed
+
+- The devcontainer no longer sets `files.useExperimentalFileWatcher`. VS Code
+  removed that setting years ago, so it was ignored and did not make Claude
+  Code's edits show up live in open editors.
+
+### Fixed
+
+- Saving a `.qmd` file no longer stalls for several seconds. Format-on-save
+  formats each R chunk separately, and those chunks went to the R language
+  server's `{styler}` formatter rather than Air, at roughly a second per chunk.
+  The devcontainer now turns off the language server's formatting, so Air
+  formats R chunks in `.qmd` files the same way it formats `.R` files. A file
+  with 16 chunks went from about 12 seconds to under 2.
+
 ## [1.0.0] - 2026-10-13
 
 Dependency stack: **R 4.6.1**, **Quarto 1.10.19**, **`{renv}` 1.2.3** (R up

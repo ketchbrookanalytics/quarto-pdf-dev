@@ -21,4 +21,27 @@ echo "==> Installing Air CLI..."
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/posit-dev/air/releases/latest/download/air-installer.sh \
   | AIR_INSTALL_DIR=/usr/local/bin AIR_NO_MODIFY_PATH=1 sh
 
+# Leave R formatting to Air. On save, the Quarto extension formats each R chunk
+# of a .qmd file by asking VS Code for "the" R formatter, which ignores
+# `editor.defaultFormatter` and can pick the R language server instead. That
+# formats with {styler} at roughly a second per chunk, so saving a .qmd file
+# with many chunks stalls for several seconds and doesn't match Air's style.
+# This turns off the language server's formatting so Air is the only R
+# formatter. It goes in Rprofile.site, not ~/.Rprofile, because R skips
+# ~/.Rprofile whenever a project has its own .Rprofile (as {renv} adds). It has
+# to exist before the R extension starts the language server, hence onCreate.
+echo "==> Leaving R formatting to Air..."
+rprofile_site="$(R RHOME)/etc/Rprofile.site"
+if ! grep -q "languageserver.server_capabilities" "$rprofile_site" 2>/dev/null; then
+  cat >> "$rprofile_site" <<'EOF'
+
+# Added by .devcontainer/onCreate.sh: leave R formatting to Air.
+options(languageserver.server_capabilities = list(
+  documentFormattingProvider = FALSE,
+  documentRangeFormattingProvider = FALSE,
+  documentOnTypeFormattingProvider = FALSE
+))
+EOF
+fi
+
 echo "==> ✅ onCreateCommand complete."

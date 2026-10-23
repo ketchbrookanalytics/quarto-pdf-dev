@@ -65,7 +65,6 @@
 		"vscode": {
 			"settings": {
 				"editor.rulers": [80],
-				"files.useExperimentalFileWatcher": true,
 	    		"r.bracketedPaste": true,
 				"r.lsp.promptToInstall": false,
 	    		"r.plot.useHttpgd": true,
@@ -84,6 +83,8 @@
     			    "editor.formatOnSave": true,
     			    "editor.defaultFormatter": "Posit.air-vscode"
     			},
+				// Formats each R chunk via the R formatter. onCreate.sh turns off
+				// the R language server's formatting, so that Air is used instead.
     			"[quarto]": {
     			    "editor.formatOnSave": true,
     			    "editor.defaultFormatter": "quarto.quarto",
